@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit backupStaticAttributes="false"
+	colors="true" beStrictAboutOutputDuringTests="false"
+	convertErrorsToExceptions="true" convertNoticesToExceptions="true"
+	convertWarningsToExceptions="true" stopOnError="true" stopOnFailure="true"
+	stopOnIncomplete="true" stopOnSkipped="false" processIsolation="false"
+	syntaxCheck="false">
+	<testsuite name="All">
+		<!-- 共通ファイル -->
+		<testsuite name="AsazukeUtil">
+			<file>test/AsazukeUtilTest.php</file>
+		</testsuite>
+		<testsuite name="AsazukeUtilFile">
+			<file>test/AsazukeUtilFileTest.php</file>
+		</testsuite>
+
+		<!-- 単体機能テスト -->
+		<testsuite name="AsazukeDB">
+			<file>test/AsazukeDBTest.php</file>
+		</testsuite>
+		<testsuite name="AsazukeSiteScan">
+			<file>test/AsazukeSiteScanTest.php</file>
+		</testsuite>
+
+		<!-- ベーシック認証下でのテスト -->
+		 <!--<testsuite name="AsazukeSiteScan-BasicAuth"> <directory>./test/</directory>
+			<file>AsazukeSiteScanBasicAuthTest.php</file> </testsuite> -->
+		<!-- ダイジェスト認証下でのテスト -->
+		 <!--<testsuite name="AsazukeSiteScan-DigestAuth"> <directory>./test/</directory>
+			<file>AsazukeSiteScanDigestAuthTest.php</file> </testsuite> -->
+		 <!--<testsuite name="AsazukeUtil"> <directory>./test/</directory> <file>AsazukeUtilTest.php</file>
+			</testsuite> <testsuite name="Asazule"> <directory>./test/</directory> <file>AsazukeTest.php</file>
+			</testsuite> -->
+	</testsuite>
+</phpunit>

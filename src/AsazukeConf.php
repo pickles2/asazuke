@@ -1,0 +1,1 @@
+AsazukeConf-sample.jp.php

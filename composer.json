@@ -1,0 +1,65 @@
+{
+    "name" : "mshiba/asazuke",
+    "type" : "library",
+    "license" : "MIT",
+    "keywords" : [
+        "api",
+        "Pickles2"
+    ],
+    "homepage" : "http://pickles2.pxt.jp/tools/asazuke/",
+    "authors" : [{
+            "name" : "Misaki Shibata",
+            "email" : "misaki.pink@gmail.com"
+        }
+    ],
+    "minimum-stability" : "stable",
+    "repositories": [],
+    "require" : {
+        "php" : ">=5.3.0",
+        "pickles2/px-fw-2.x" : "2.0.*",
+        "pickles2/px2-sitemapexcel" : "2.0.*",
+        "zendframework/zend-servicemanager" : "2.5.1",
+        "zendframework/zend-stdlib" : "2.5.1",
+        "zendframework/zend-text" : "2.5.1",
+        "symfony/finder" : "~2.7"
+    },
+    "require-dev" : {
+        "phpunit/phpunit" : "4.1.*"
+    },
+    "config": {
+        "process-timeout": 86400
+    },
+    "scripts":{
+         "darwin-chmod": ["chmod -R 777 src/data", "chmod 777 src/Asazuke.log desktop.sql"],
+         "win32-copy-conf": ["copyConf.bat"],
+         "run"          : ["php index.php"],
+         "run:file-sql"      : ["php index.php file-sql"],
+         "run:file-sql-json" : ["php index.php file-sql-json"],
+         "run:conf-json": ["php index.php conf-json"],
+         "run:site-scan": ["php index.php site-scan"],
+         "run:csv"      : ["php index.php csv"],
+         "run:show"     : ["php index.php show"],
+         "run:table"    : ["php index.php table"],
+         "run:schema"   : ["php index.php schema"],
+         "run:rm-dat"   : ["php index.php rm-dat"],
+         "run:rm-html"  : ["php index.php rm-html"],
+         "run:site-validation"      : ["php index.php rm-dat", "php index.php rm-html", "php index.php site-validation"],
+         "run:site-validation-ex"   : ["php index.php rm-dat", "php index.php rm-html", "php index.php site-validation", "php index.php rm-cssworks", "php index.php cssworks"],
+         "run:site-validation-show" : ["php index.php site-validation-show"],
+         "run:site-validation-json" : ["php index.php site-validation-json"],
+         "run:site-validation-csv"  : [ "php index.php site-validation-csv"],
+         "run:site-validation-csv-origin"  : ["php index.php site-validation-csv-origin"],
+         "run:site-validation-result"  : ["php index.php site-validation-result"],
+         "run:rm-scraping": ["php index.php rm-scraping"],
+         "run:scraping"   : ["php index.php rm-scraping", "php index.php scraping"],
+         "run:rm-cssworks": ["php index.php rm-cssworks"],
+         "run:cssworks"  :  ["php index.php rm-cssworks", "php index.php cssworks"],
+         "run:inline":  ["php index.php inline"],
+         "test" : ["vendor/phpunit/phpunit/phpunit --configuration phpunit.xml"]
+    },
+    "autoload" : {
+        "psr-4" : {
+            "Mshiba\\Px2lib\\Asazuke\\" : "src/"
+        }
+    }
+}
