@@ -7,9 +7,9 @@ require('config.php');
 //「.htaccess」代理
 // AddType application/x-httpd-php .php .html
 $inc_file = $_SERVER["SCRIPT_FILENAME"];
-if(PHP_OS === 'Darwin'){
-  $inc_file = $_SERVER["SCRIPT_NAME"];
-}
+//if(PHP_OS === 'Darwin'){
+//  $inc_file = $_SERVER["SCRIPT_NAME"];
+//}
 $path = pathinfo($inc_file);
 //var_dump($path);
 //exit;
