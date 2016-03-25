@@ -32,6 +32,7 @@
     "scripts":{
          "darwin-chmod": ["chmod -R 777 src/data", "chmod 777 src/Asazuke.log desktop.sql"],
          "win32-copy-conf": ["copyConf.bat"],
+         "which-php": ["php -r 'echo $_SERVER[\"_\"];'"],
          "run"          : ["php index.php"],
          "run:file-sql"      : ["php index.php file-sql"],
          "run:file-sql-json" : ["php index.php file-sql-json"],
