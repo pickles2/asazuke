@@ -464,7 +464,7 @@ EOL;
 
 'Asazuke'で使える、'composer'の詳しい説明は下記のリンクをご参照して下さい。
 ```
-https://github.com/Misaki-Shibata/asazuke#その他コマンド
+https://github.com/pickles2/asazuke#その他コマンド
 ```
 
 
