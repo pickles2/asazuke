@@ -101,7 +101,7 @@ EOF;
                 $url = AsazukeConf::$url . $path;
                 // $html = file_get_contents($url);
                 $html = AsazukeUtil::http_file_get_contents($url, $response);
-                $tidy = tidy_parse_string($html);
+                $tidy = tidy_parse_string($html, array(), AsazukeConf::$tidyEncoding);
                 $tidy->cleanRepair();
 
                 $pattern = '/Error:/';
@@ -277,7 +277,7 @@ EOF;
         $html = file_get_contents($pathP);
         $copyHtml = $html;
 
-        $tidy = tidy_parse_string($html);
+        $tidy = tidy_parse_string($html, array(), AsazukeConf::$tidyEncoding);
         $tidy->cleanRepair();
 
         $pattern = '/Error:/';
@@ -332,7 +332,7 @@ EOF;
 
             $html = file_get_contents($htmlPath);
 
-            $tidy = tidy_parse_string($html);
+            $tidy = tidy_parse_string($html, array(), AsazukeConf::$tidyEncoding);
             $tidy->cleanRepair();
 
             $pattern = '/Error:/';
@@ -420,7 +420,7 @@ EOF;
             // echo $cssWorksFile . "\n";
             {
                 $html = file_get_contents($cssWorksFile);
-                $tidy = tidy_parse_string($html);
+                $tidy = tidy_parse_string($html, array(), AsazukeConf::$tidyEncoding);
                 $tidy->cleanRepair();
 
                 $doc = \phpQuery::newDocument($html);
@@ -586,7 +586,7 @@ EOF;
             // echo $cssWorksFile . "\n";
             {
                 $html = file_get_contents($cssWorksFile);
-                $tidy = tidy_parse_string($html);
+                $tidy = tidy_parse_string($html, array(), AsazukeConf::$tidyEncoding);
                 $tidy->cleanRepair();
 
                 $doc = \phpQuery::newDocument($html);

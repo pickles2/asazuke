@@ -10,6 +10,9 @@ class AsazukeConfGeneral
     }
     // 制御コード
     public static $ctrlCd = false;
+    // tidy(妥当ではない HTML文書を修正し扱える形式に変換する)
+    // encoding は入出力ドキュメントのエンコーディングを設定します。 使用可能なエンコーディングは ascii、latin0、latin1、 raw、utf8、iso2022、 mac、win1252、ibm858、 utf16、utf16le、utf16be、 big5 および shiftjis です。
+    public static $tidyEncoding = "utf8";
     // Timezone
     public static $timezone = 'Asia/Tokyo';
     // 内蔵サーバー 
