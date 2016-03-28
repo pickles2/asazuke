@@ -102,7 +102,7 @@ if (count($argv) >= 2) {
             }
             file_put_contents($cssPath, $copyHtml);
         }
-        echo "Finished."."\n";
+        echo "Finished!! (HTMLダウンロード)";
         echo str_repeat("\n", 4);
         exit(0);
     }
@@ -293,7 +293,8 @@ if (count($argv) >= 2) {
         // ブラウザで開く
         // $cmd = 'open -b com.google.Chrome http://' . AsazukeConf::$buildInServerIp . ':' . AsazukeConf::$buildInServerPort . '/mst.php';
         // exec($cmd, $arr, $res);
-        echo "Finished."."\n";
+        //echo "Finished."."\n";
+        echo "Finished!! (サイトマップCSV作成)";
         exit(0);
     }
     if ($argv[1] === 'site-validation-csv') {
@@ -305,6 +306,7 @@ if (count($argv) >= 2) {
 
         $Asazuke = new Asazuke\Asazuke();
         $Asazuke->createPx2CSV($result);
+        //echo "Finished!! (サイトマップCSV作成)";
         exit(0);
     }
     if ($argv[1] === 'site-validation-result') {
@@ -398,6 +400,7 @@ EOL;
 
         $AsazukeSiteScan = new Asazuke\AsazukeSiteScan();
         $AsazukeSiteScan->exec();
+        echo "Finished!! (サイトスキャン)";
         exit(0);
     }
     if ($argv[1] === 'csv') {
