@@ -635,7 +635,36 @@ EOF;
                         $html = $doc[$selecter]->html();
                     }
                     // fwrite($stream, $html);
-                    $AsazukeUtilFile->out($html . "\n\n\n\n", true);
+                    //相対パス置換
+                    {
+                          $r_tidy = tidy_parse_string($html, array(), AsazukeConf::$tidyEncoding);
+                          $r_tidy->cleanRepair();
+
+                          $r_doc = \phpQuery::newDocument($html);
+                          $r_aryHref = array();
+                          //$arySrc = array();
+                          foreach ($r_doc["*"] as $r_elem) {
+                              $r_aryHref[] = pq($r_elem)->attr('href');
+                              //$arySrc[] = pq($r_elem)->attr('src');
+                          }
+                          // urlの長いものから順に処理する。
+                          $r_aryHref = array_values(array_filter($r_aryHref, "strlen"));
+                          usort($r_aryHref, function($a, $b){
+                            return ($a < $b) ? -1 : 1;
+                          });
+                          //var_dump($r_aryHref);
+                          $m_mix = parse_url(AsazukeConf::$url);
+                          foreach($r_aryHref AS $r_idx => $r_val){
+                            $r_mix = parse_url($r_val);
+                            //echo $r_mix['host'] . ' + ' . $r_mix['path']. "\n";
+                            //echo $m_mix['host'] . "\n";
+                            if($r_mix['host'] === $m_mix['host']){
+                              $html = str_replace($r_mix['scheme'].'://'.$r_mix['host'].$r_mix['path'], $r_mix['path'], $html);
+                            }
+                          }
+                          $AsazukeUtilFile->out($html . "\n\n\n\n", true);
+                    }
+                    
                 }
 
                 $tmpId[] = $id;
@@ -751,4 +780,5 @@ ${expHtdocs}
 
 EOL;
     }
+
 }
