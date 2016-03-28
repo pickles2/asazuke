@@ -459,6 +459,11 @@ EOF;
                     if ($mixed !== FALSE) {
                         unset($aryData[$mixed]);
                     }
+                    // 自分自身は含まない
+                    $mixed = array_search($path, $aryData);
+                    if ($mixed !== FALSE) {
+                        unset($aryData[$mixed]);
+                    }
 
                     $csvRowData['* logical_path'] = implode('>', $aryData);
                 }
