@@ -30,8 +30,6 @@ class AsazukeConfGeneral
 
     public static $dataDir = '/data/';
 
-
-
     // for Windows
     // public static $csv_format = [
     // "encoding" => "SJIS-win",
@@ -42,22 +40,4 @@ class AsazukeConfGeneral
         "encoding" => "UTF-8",
         "linefeed" => "\n"
     ];
-
-
-
-    // HTML出力
-    public static $export_html = [
-        [
-            'name' => 'outerHTML',
-            'selector' => '.contents',
-            'scope' => 'outerHTML'
-        ]
-    ]
-    // ,
-    // [
-    // 'name' => 'innerHTML',
-    // 'selector' => '.contents',
-    // 'scope' => 'innerHTML'
-    // ]
-    ;
 }

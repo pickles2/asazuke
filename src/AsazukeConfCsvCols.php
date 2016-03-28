@@ -14,8 +14,8 @@ class AsazukeConfCsvCols extends AsazukeConfGeneral
         '* title_h1' => 'h1',
         '* title_label' => '',
         '* title_full' => '',
-        // '* logical_path' => 'header .breadcrumb ul li a',
-        '* logical_path' => '[class*="breadcrumbs"]',
+        '* logical_path' => 'header .breadcrumb ul li a',
+        // '* logical_path' => '[class*="breadcrumbs"]',
         '* list_flg' => '{1}',
         '* layout' => '',
         '* orderby' => '',
@@ -43,16 +43,15 @@ class AsazukeConfCsvCols extends AsazukeConfGeneral
     // WEBスクレイピングの設定
     public static $export_html = [
         [
-            'name' => 'outerHTML',
+            'name' => 'outerHTMLのテスト',
             'selector' => '.contents',
             'scope' => 'outerHTML'
         ]
-    ]
-    // ,
-    // [
-    // 'name' => 'innerHTML',
-    // 'selector' => '.contents',
-    // 'scope' => 'innerHTML'
-    // ]
-    ;
+        // ,
+        // [
+        // 'name' => 'innerHTMLのテスト',
+        // 'selector' => '.contents',
+        // 'scope' => 'innerHTML'
+        // ]
+    ];
 }
