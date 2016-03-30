@@ -102,7 +102,7 @@ if (count($argv) >= 2) {
             }
             file_put_contents($cssPath, $copyHtml);
         }
-        echo "Finished."."\n";
+        echo "Finished!! (html-download)";
         echo str_repeat("\n", 4);
         exit(0);
     }
@@ -293,7 +293,7 @@ if (count($argv) >= 2) {
         // ブラウザで開く
         // $cmd = 'open -b com.google.Chrome http://' . AsazukeConf::$buildInServerIp . ':' . AsazukeConf::$buildInServerPort . '/mst.php';
         // exec($cmd, $arr, $res);
-        echo "Finished."."\n";
+        echo "Finished!! (scraping)";
         exit(0);
     }
     if ($argv[1] === 'site-validation-csv') {
@@ -398,6 +398,7 @@ EOL;
 
         $AsazukeSiteScan = new Asazuke\AsazukeSiteScan();
         $AsazukeSiteScan->exec();
+        echo "Finished!! (site-scan)";
         exit(0);
     }
     if ($argv[1] === 'csv') {
@@ -461,7 +462,7 @@ EOL;
 
 'Asazuke'で使える、'composer'の詳しい説明は下記のリンクをご参照して下さい。
 ```
-https://github.com/Misaki-Shibata/asazuke#その他コマンド
+https://github.com/pickles2/asazuke#その他コマンド
 ```
 
 

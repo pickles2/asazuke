@@ -101,7 +101,7 @@ EOF;
                 $url = AsazukeConf::$url . $path;
                 // $html = file_get_contents($url);
                 $html = AsazukeUtil::http_file_get_contents($url, $response);
-                $tidy = tidy_parse_string($html);
+                $tidy = tidy_parse_string($html, array(), AsazukeConf::$tidyEncoding);
                 $tidy->cleanRepair();
 
                 $pattern = '/Error:/';
@@ -277,7 +277,7 @@ EOF;
         $html = file_get_contents($pathP);
         $copyHtml = $html;
 
-        $tidy = tidy_parse_string($html);
+        $tidy = tidy_parse_string($html, array(), AsazukeConf::$tidyEncoding);
         $tidy->cleanRepair();
 
         $pattern = '/Error:/';
@@ -332,7 +332,7 @@ EOF;
 
             $html = file_get_contents($htmlPath);
 
-            $tidy = tidy_parse_string($html);
+            $tidy = tidy_parse_string($html, array(), AsazukeConf::$tidyEncoding);
             $tidy->cleanRepair();
 
             $pattern = '/Error:/';
@@ -420,7 +420,7 @@ EOF;
             // echo $cssWorksFile . "\n";
             {
                 $html = file_get_contents($cssWorksFile);
-                $tidy = tidy_parse_string($html);
+                $tidy = tidy_parse_string($html, array(), AsazukeConf::$tidyEncoding);
                 $tidy->cleanRepair();
 
                 $doc = \phpQuery::newDocument($html);
@@ -456,6 +456,11 @@ EOF;
 
                     // トップページは含まない
                     $mixed = array_search('/', $aryData);
+                    if ($mixed !== FALSE) {
+                        unset($aryData[$mixed]);
+                    }
+                    // 自分自身は含まない
+                    $mixed = array_search($path, $aryData);
                     if ($mixed !== FALSE) {
                         unset($aryData[$mixed]);
                     }
@@ -586,7 +591,7 @@ EOF;
             // echo $cssWorksFile . "\n";
             {
                 $html = file_get_contents($cssWorksFile);
-                $tidy = tidy_parse_string($html);
+                $tidy = tidy_parse_string($html, array(), AsazukeConf::$tidyEncoding);
                 $tidy->cleanRepair();
 
                 $doc = \phpQuery::newDocument($html);
@@ -630,7 +635,36 @@ EOF;
                         $html = $doc[$selecter]->html();
                     }
                     // fwrite($stream, $html);
-                    $AsazukeUtilFile->out($html . "\n\n\n\n", true);
+                    //相対パス置換
+                    {
+                          $r_tidy = tidy_parse_string($html, array(), AsazukeConf::$tidyEncoding);
+                          $r_tidy->cleanRepair();
+
+                          $r_doc = \phpQuery::newDocument($html);
+                          $r_aryHref = array();
+                          //$arySrc = array();
+                          foreach ($r_doc["*"] as $r_elem) {
+                              $r_aryHref[] = pq($r_elem)->attr('href');
+                              //$arySrc[] = pq($r_elem)->attr('src');
+                          }
+                          // urlの長いものから順に処理する。
+                          $r_aryHref = array_values(array_filter($r_aryHref, "strlen"));
+                          usort($r_aryHref, function($a, $b){
+                            return ($a < $b) ? -1 : 1;
+                          });
+                          //var_dump($r_aryHref);
+                          $m_mix = parse_url(AsazukeConf::$url);
+                          foreach($r_aryHref AS $r_idx => $r_val){
+                            $r_mix = parse_url($r_val);
+                            //echo $r_mix['host'] . ' + ' . $r_mix['path']. "\n";
+                            //echo $m_mix['host'] . "\n";
+                            if($r_mix['host'] === $m_mix['host']){
+                              $html = str_replace($r_mix['scheme'].'://'.$r_mix['host'].$r_mix['path'], $r_mix['path'], $html);
+                            }
+                          }
+                          $AsazukeUtilFile->out($html . "\n\n\n\n", true);
+                    }
+                    
                 }
 
                 $tmpId[] = $id;
@@ -746,4 +780,5 @@ ${expHtdocs}
 
 EOL;
     }
+
 }
