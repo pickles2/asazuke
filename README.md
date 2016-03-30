@@ -32,7 +32,7 @@ $ composer run
 ## その他コマンド
 |コマンド|コマンド説明|
 |---|---|
-|$ composer chmod|sqliteを使う為に書込権限の変更|
+|$ composer darwin-chmod|sqliteを使う為に書込権限の変更|
 |$ composer win32-copy-conf|設定ファイルコピー(Windows)|
 |$ composer run|設定を表示|
 |$ composer run:file-sql|SQLファイルの実行|
