@@ -44,7 +44,7 @@ class AsazukeConfCsvCols extends AsazukeConfGeneral
     public static $export_html = [
         [
             'name' => 'outerHTMLのテスト',
-            'selector' => '.contents',
+            'selector' => 'body',
             'scope' => 'outerHTML'
         ]
         // ,

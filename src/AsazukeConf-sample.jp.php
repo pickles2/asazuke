@@ -14,6 +14,10 @@ class AsazukeConf extends AsazukeConfCsvCols
     public static $authUser = '';
     public static $authPass = '';
 
+  // UserAgent
+    public static $userAgent = 'Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.1; Trident/6.0)';
+    // public static $userAgent = 'Mozilla/5.0 (iPhone; CPU iPhone OS 8_0_2 like Mac OS X) AppleWebKit/600.1.4 (KHTML, like Gecko) Version/8.0 Mobile/12A405 Safari/600.1.4';
+
   // プロジェクト名 = ディレクトリ名
   public static $projectName = 'sample.jp';
 

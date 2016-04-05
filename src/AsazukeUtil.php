@@ -581,6 +581,7 @@ EOL;
             CURLOPT_MAXREDIRS      =>  10,  // CURLOPT_FOLLOWLOCATIONの辿る最大値、
             CURLOPT_SSL_VERIFYPEER => false,    // for https
             CURLOPT_USERPWD        => AsazukeConf::$authUser . ":" . AsazukeConf::$authPass, // 接続に使用するユーザー名とパスワード。 "[username]:[password]" 形式で指定します。
+            CURLOPT_USERAGENT      => AsazukeConf::$userAgent, // UserAgent
             CURLOPT_HTTPAUTH       => CURLAUTH_ANY, // 使用する HTTP 認証方法。以下の中から選びます。 CURLAUTH_BASIC、 CURLAUTH_DIGEST、 CURLAUTH_GSSNEGOTIATE、 CURLAUTH_NTLM、 CURLAUTH_ANY および CURLAUTH_ANYSAFE。
               
             # コレを設定するとgithub.ioでは405になるサーバーがあるので注意 →テストが通らなくなります。
