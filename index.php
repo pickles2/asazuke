@@ -389,12 +389,21 @@ EOL;
         AsazukeUtil::createCSV($result);
         exit(0);
     }
-    if ($argv[1] === 'site-scan') {
-        // php index.php sitescan
+    if ($argv[1] === 'site-scan0') {
+        // php index.php sitescan (新規)
         date_default_timezone_set(Asazuke\AsazukeConf::$timezone);
         $db_file = Asazuke\AsazukeConf::getDbFile();
         $dt = date("md_His");
         rename($db_file, $db_file . ".${dt}");
+
+        $AsazukeSiteScan = new Asazuke\AsazukeSiteScan();
+        $AsazukeSiteScan->exec();
+        echo "Finished!! (site-scan)";
+        exit(0);
+    }
+    if ($argv[1] === 'site-scan') {
+        // php index.php sitescan (再開)
+        date_default_timezone_set(Asazuke\AsazukeConf::$timezone);
 
         $AsazukeSiteScan = new Asazuke\AsazukeSiteScan();
         $AsazukeSiteScan->exec();

@@ -16,8 +16,6 @@
     "repositories": [],
     "require" : {
         "php" : ">=5.3.0",
-        "pickles2/px-fw-2.x" : "2.0.*",
-        "pickles2/px2-sitemapexcel" : "2.0.*",
         "zendframework/zend-servicemanager" : "2.5.1",
         "zendframework/zend-stdlib" : "2.5.1",
         "zendframework/zend-text" : "2.5.1",
@@ -37,7 +35,8 @@
          "run:file-sql"      : ["php index.php file-sql"],
          "run:file-sql-json" : ["php index.php file-sql-json"],
          "run:conf-json": ["php index.php conf-json"],
-         "run:site-scan": ["php index.php site-scan"],
+         "run:site-scan0": ["php index.php site-scan0"],
+         "run:site-scan" : ["php index.php site-scan"],
          "run:csv"      : ["php index.php csv"],
          "run:show"     : ["php index.php show"],
          "run:table"    : ["php index.php table"],
