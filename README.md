@@ -38,7 +38,8 @@ $ composer run
 |$ composer run:file-sql|SQLファイルの実行|
 |$ composer run:file-sql-json|SQLファイルの実行、結果をjsonで出力|
 |$ composer run:conf-json|設定をjson形式で出力|
-|$ composer run:site-scan|ディレクトリツリーを作成|
+|$ composer run:site-scan0|ディレクトリツリーを作成(新規)|
+|$ composer run:site-scan|ディレクトリツリーを作成(再開)|
 |$ composer run:csv <数値>|CSV出力、<数値>に1が指定された場合't_1st'をCSV出力|
 |$ composer run:show <数値>|標準出力、<数値>に1が指定された場合't_1st'を標準出力|
 |$ composer run:table|テーブル一覧を表示|
