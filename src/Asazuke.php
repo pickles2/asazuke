@@ -268,54 +268,61 @@ EOF;
     }
 
     /**
+    * @param string $html 解析するHTML
+    * @return array preg_match_allの結果
+    */
+    public function grepHref($html) {
+        $ptn='/<a[^>]href\s?=\s?[\"\']([^\"\']+)[\"\'][^>]*>/i';
+        preg_match_all($ptn, $html, $m);
+        return $m;
+    }
+
+  /**
+    * @param string $html 解析するHTML
+    * @return array preg_match_allの結果
+    */
+    public function grepSrc($html) {
+        $ptn='/<a[^>]src\s?=\s?[\"\']([^\"\']+)[\"\'][^>]*>/i';
+        preg_match_all($ptn, $html, $m);
+        return $m;
+    }
+
+    /**
      * cssとsrcのパス解決
      */
     public function pathResolve($aryPaths, $aryIndex, $relativePath)
     {
         $pathP = $aryPaths[$aryIndex];
 
-        $html = file_get_contents($pathP);
-        $copyHtml = $html;
-
-        $tidy = tidy_parse_string($html, array(), AsazukeConf::$tidyEncoding);
-        $tidy->cleanRepair();
-
-        $pattern = '/Error:/';
-        $matchesErr = preg_grep($pattern, AsazukeUtil::str2array($tidy->errorBuffer));
-
-        $pattern = '/Warning:/';
-        $matchesWar = preg_grep($pattern, AsazukeUtil::str2array($tidy->errorBuffer));
-
-        $doc = \phpQuery::newDocument($html);
-
-        $aryHref = array();
-        $arySrc = array();
-        foreach ($doc["*"] as $elem) {
-            $aryHref[] = pq($elem)->attr('href');
-            $arySrc[] = pq($elem)->attr('src');
-        }
-        $aryH = array_unique($aryHref, SORT_STRING); // 重複削除
-        $sortAryH = array_values(array_filter($aryH, "strlen")); // 空配列を削除+ 添字リセット
-        $aryS = array_unique($arySrc, SORT_STRING); // 重複削除
-        $sortAryS = array_values(array_filter($aryS, "strlen")); // 空配列を削除+ 添字リセット
-
         $mst = AsazukeConf::$url;
 
-        // <a href="">,<link href="">の処理
-        foreach ($sortAryH as $path) {
-            $path2 = AsazukeUtil::getResolvePath($path, $mst, $relativePath);
-            $copyHtml = str_replace('href="' . $path . '"', 'href="' . $path2 . '"', $copyHtml);
-            // $copyHtml = str_replace('href=\'' . $path . '\'', 'href=\'' . $path2 . '\'', $copyHtml);
-        }
+        // ファイルを1行ずつ処理
+        $newfile = "";
+        $file = fopen($pathP, "r");
+        
+        if($file){
+            while ($line = fgets($file)) {
+                
+                $aryHref = $this->grepHref($line);
+                $arySrc = $this->grepSrc($line);
+                $sortAryH = $aryHref[1];
+                $sortAryS = $arySrc[1];
+                
+                foreach ($sortAryH as $path) {
+                    $path2 = AsazukeUtil::getResolvePath($path, $mst, $relativePath);
+                    $line = str_replace('href="' . $path . '"', 'href="' . $path2 . '"', $line);
+                }
 
-        // <img src=""> の処理
-        foreach ($sortAryS as $path) {
-            $path2 = AsazukeUtil::getResolvePath($path, $mst, $relativePath);
-            // echo $path. " ->" . $path2."\n";
-            $copyHtml = str_replace('src="' . $path . '"', 'src="' . $path2 . '"', $copyHtml);
-            // $copyHtml = str_replace('src=\'' . $path . '\'', 'src=\'' . $path2 . '\'', $copyHtml);
+                // <img src=""> の処理
+                foreach ($sortAryS as $path) {
+                    $path2 = AsazukeUtil::getResolvePath($path, $mst, $relativePath);
+                    $line = str_replace('src="' . $path . '"', 'src="' . $path2 . '"', $line);
+                }
+                $newfile .= $line;
+            }
         }
-        return $copyHtml;
+        fclose($file);
+        return $newfile;
     }
 
     /**
