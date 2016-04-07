@@ -1,6 +1,7 @@
 <?php
 chdir(__DIR__);
 ini_set('memory_limit', - 1); // 無制限
+set_time_limit(86400);
 gc_enable(); // GC有効
 
 $D = dirname(__FILE__);
