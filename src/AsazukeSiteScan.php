@@ -257,6 +257,8 @@ class AsazukeSiteScan
      */
     public function text2utf8($text){
         $nkfpath = '/usr/local/bin/nkf';
+        //$text = preg_replace('/(?:\n|\r|\r\n)/','',$text);
+        $text = '"'.mb_ereg_replace("\"", '\"', $text).'"';
         $command = popen("echo $text | $nkfpath -w -Lu ","r");
         $result = "";
         while (!feof($command)) {
@@ -316,7 +318,7 @@ class AsazukeSiteScan
           
           if(!$bool){
             echo "Skip -> ".$url. ' message:htmlとして処理出来ませんでした。';
-            return true;
+            //return true;
           }
             
 
