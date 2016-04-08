@@ -565,8 +565,20 @@ EOL;
         return $data;
     }
 
+    /**
+     * URLチェック
+     */
+    public static function is_valid_url($url) {
+          // こんな便利関数があったのか
+          return filter_var($url, FILTER_VALIDATE_URL) && preg_match('@^https?+://@i', $url);
+    }
+
     public static function curl_file_get_contents($url, &$response, $followlocation=true)
     {
+      if(!self::is_valid_url($url)){
+        return '';
+      }
+      
       error_reporting(E_ALL);
       ini_set( 'display_errors','1');
       // echo $url.PHP_EOL;
@@ -603,9 +615,9 @@ EOL;
         if ($status_code != 200)
           // 200以外は出力
           self::logW('', '$status_code:'. $status_code. ' $url:'.$url);
-      } catch(Exception $ex) {
+      } catch(\Exception $ex) {
           if ($ch != null) curl_close($ch);
-          throw new \Exception($ex);
+          echo 'Skip -> '. $url . '    message:'. $ex->getMessage();
       }
 
       $header_size = curl_getinfo($ch, CURLINFO_HEADER_SIZE);

@@ -295,7 +295,17 @@ class AsazukeSiteScan
         AsazukeUtil::logV("URL(on Database)", $_url);
         echo ("URL(on Database)" .$_url.PHP_EOL);
         try {
+          // \phpQuery::newDocument($html); でfatal errorがでる場合があるので事前チェックを実施
+          echo 'loadHTML:::.'."\n";
+          $bool = \DOMDocument::loadHTML($html);
+          if(!$bool){
+            echo "Skip -> ".$url. ' message:htmlとして処理出来ませんでした。';
+            return true;
+          }
+            
+
             $sortAryA = $this->getHref($html);
+
 
             $AsazukeSiteScanDB = new AsazukeDB();
 
