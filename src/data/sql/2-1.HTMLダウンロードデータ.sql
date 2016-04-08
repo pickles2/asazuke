@@ -5,8 +5,8 @@
 .width 0 70 0 0
 
 SELECT
-   -- * // TODO htmlエスケープするの忘れた。
-   id, filePath, errorCount, warningCount
+   -- *
+  id, filePath, errorCount, warningCount
 FROM
    t_asazuke
 ;
