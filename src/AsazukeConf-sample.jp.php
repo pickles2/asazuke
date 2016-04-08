@@ -1,7 +1,7 @@
 <?php
 namespace Mshiba\Px2lib\Asazuke;
 
-class AsazukeConf extends AsazukeConfCsvCols
+class AsazukeConf extends AsazukeConfGeneral
 {
   // 実行環境設定
   // public static $startPath = '/ja/diary/';
