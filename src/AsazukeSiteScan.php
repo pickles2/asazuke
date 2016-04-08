@@ -252,7 +252,20 @@ class AsazukeSiteScan
       AsazukeUtil::logV("pathClean", $v_org . ' -> ' . $v);
       return $v;
     }
-
+    /**
+     * なんでもUTF-8に変換
+     */
+    public function text2utf8($text){
+        $nkfpath = '/usr/local/bin/nkf';
+        $command = popen("echo $text | $nkfpath -w -Lu ","r");
+        $result = "";
+        while (!feof($command)) {
+            $result .= fgets($command);
+        }
+        pclose($command);
+        return $result;
+    }
+    
     /**
      * メインロジック
      */
@@ -297,7 +310,10 @@ class AsazukeSiteScan
         try {
           // \phpQuery::newDocument($html); でfatal errorがでる場合があるので事前チェックを実施
           echo 'loadHTML:::.'."\n";
+          // 文字コード変換(utf8化)
+          $html = $this->text2utf8($html);
           $bool = \DOMDocument::loadHTML($html);
+          
           if(!$bool){
             echo "Skip -> ".$url. ' message:htmlとして処理出来ませんでした。';
             return true;
