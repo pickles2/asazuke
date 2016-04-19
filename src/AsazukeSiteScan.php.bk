@@ -169,11 +169,158 @@ class AsazukeSiteScan
     public function getHref($html){
       // 2 phpQueryのドキュメントオブジェクトを生成
       $html = $this->text2utf8($html);
+//echo $html;
+//if(strstr($html, 'http-equiv="refresh"')){
+//      AsazukeUtil::logE("metarefresh", 'html -> ' .preg_replace('/(?:\n|\r|\r\n)/', '', $html));
+//$html = '<html><head></head><body></body></html>';
+//}
+      $doc = \phpQuery::newDocument($html);
+      $aryA = array();
+      // foreach ($doc["a"] as $a) {
+      //     $link = pq($a)->attr('href');
+      //     $aryA[] = $link;
+      // }
+      // foreach ($doc["area"] as $a) {
+      //     $link = pq($a)->attr('href');
+      //     $aryA[] = $link;
+      // }
+      foreach ($doc["*"] as $a) {
+        $link = pq($a)->attr('href');
+         // 空白削除
+        $link = preg_replace('/ /', '', $link);
+        // パラメータ削除
+        if(preg_match('/\?/', $link) == 1){
+          $link = explode('?', $link)[0];
+        }
+
+        if(!AsazukeConf::$isInsistently){
+          $aryA[] = $link;
+        }else{
+          // ディレクトリ分割
+          if (preg_match('/^https?/i', $link) == 1) {
+            $aryA[] = $link;
+          } else {
+            $aryLink2 = $aryLink = explode('/', $link);
+            foreach ($aryLink as $Link) {
+              $aryA[] = implode('/', $aryLink2);
+              array_pop($aryLink2);
+            }
+          }
+        }
+      }
+      $filterAryA = array_filter($aryA, "strlen"); // 空配列を削除
+      $sortAryA = array_unique($filterAryA, SORT_STRING); // 重複削除
+      asort($sortAryA, SORT_STRING); // ソート
+      // echo "---------------";
+      // var_dump($sortAryA);
+      return $sortAryA;
+    }
+
+    /**
+     * 相対パスから、ルート相対パスを取得
+     */
+    public function getRootRelativeURLs($url, $v){
+      // relative URLs(相対パス)
+      extract(AsazukeUtil::ext_parse_url($url), EXTR_OVERWRITE);
+      $parsed_url = parse_url($url);
+      $newPath = '';
+      if (AsazukeUtil::array_last(str_split($path)) === '/') {
+          // echo "'/'で終わっている場合";
+          $newPath = $path . $v;
+      } else {
+          // echo "'/'で終わっていない場合";
+          // 拡張子判定
+          if(AsazukeUtil::isFile($path)){
+            $newPath = $path . $v;
+          }else{
+            $newPath = $path . '/' . $v;
+          }
+      }
+
+      $newURL = AsazukeUtil::createUri($url, $newPath);
+      $rootRelativeURLs = parse_url($newURL, PHP_URL_PATH);
+      // echo $rootRelativeURLs.PHP_EOL;
+      return $rootRelativeURLs;
+    }
+
+    /**
+     * パス中の"."を解決する
+     * $v = ルート相対パス
+     */
+    public function pathClean($v){
+      $v_org = $v;
+      $newRootRelativeURLs = AsazukeUtil::asRealPath($v);
+      $v = $newRootRelativeURLs;
+      // パス途中に'./'を含む場合は削除
+      $v = preg_replace('/\.\//', '', $v);
+      // 記述ミスなどにより//になっている？
+      $v = preg_replace('/\/\//', '/', $v);
+      AsazukeUtil::logV("pathClean", $v_org . ' -> ' . $v);
+      return $v;
+    }
+    /**
+     * なんでもUTF-8に変換
+     */
+    public function text2utf8($text){
+        $nkfpath = '/usr/local/bin/nkf';
+        //$text = preg_replace('/(?:\n|\r|\r\n)/','',$text);
+        $text = '"'.mb_ereg_replace("\"", '\"', $text).'"';
+        $command = popen("echo $text | $nkfpath -w -Lu ","r");
+        $result = "";
+        while (!feof($command)) {
+            $result .= fgets($command);
+        }
+        pclose($command);
+        return $result;
+    }
+    
+    /**
+     * メインロジック
+     */
+    public function oneFileExec($path, &$unitTestResult = array())
+    {
+        AsazukeUtil::logV('oneFileExec', $path);
+        $resultStatus = false;
+        $skipLinks = array();
+        {
+            // 例外処理
+            if (preg_match('/^javascript/i', $path)) {
+                // echo "javascriptで始まるURL";
+                return AsazukeMessage::$CD_JS;
+            }
+            if (preg_match('/^mailto/i', $path)) {
+              // echo "mailtoで始まるURL";
+                return AsazukeMessage::$CD_MAILTO;
+            }
+            if (! preg_match('/^\//', $path)) {
+              // echo "先頭に"/"が含まれていない場合";
+                $path = '/' . $path;
+            }
+        }
+
+        $mst = AsazukeConf::$url;
+        $relative = $path;
+
+        $_url = AsazukeUtil::getResolvePath($path, $mst, $relative);
+        // $_url = preg_replace('/^http:/', 'https:', $_url);
+        //echo "${_url}\n";
+
+        extract($this->checkStatusCode($_url), EXTR_OVERWRITE);
+        // echo "-------------------URL:". $_url;
+        // echo $html;
+        //echo '$statusCode:'.$statusCode."\n";
+        if($statusCode !== AsazukeMessage::$CD_2XX){
+          AsazukeUtil::logV('', '2XX以外は処理を中断する。');
+          return $statusCode;
+        }
+        AsazukeUtil::logV("URL(on Database)", $_url);
+        echo ("URL(on Database)" .$_url.PHP_EOL);
+        try {
+          // \phpQuery::newDocument($html); でfatal errorがでる場合があるので事前チェックを実施
+          echo 'loadHTML:::.'."\n";
+          // 文字コード変換(utf8化)
+          $html = $this->ext2utf8($html);
 echo $html;
-if(stristr($html, 'http-equiv="refresh"')){
-     AsazukeUtil::logE("metarefresh", 'html -> ' .preg_replace('/(?:\n|\r|\r\n)/', '', $html));
-$html = '<html><head></head><body></body></html>';
-}
       $doc = \phpQuery::newDocument($html);
       $aryA = array();
       // foreach ($doc["a"] as $a) {

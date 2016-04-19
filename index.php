@@ -163,8 +163,8 @@ if (count($argv) >= 2) {
         rmDat();
         rmHtml();
         siteValidation();
-        rmCssworks();
-        cssworks();
+        //rmCssworks();
+        //cssworks();
         return true;
     }
     if ($argv[1] === 'queue_scraping') {
