@@ -128,8 +128,6 @@ function siteValidation()
     // 表の初期化
     $AsazukeSiteScanDB->truncate('t_asazuke');
     $result = $AsazukeSiteScanDB->select();
-    // $result = $AsazukeSiteScanDB->select('id <> 548');// が処理できない 除外する
-    // $result = $AsazukeSiteScanDB->select('id <> 538');
     $aryCsv = array();
     foreach ($result as $value) {
         $aryCsvRow = array();

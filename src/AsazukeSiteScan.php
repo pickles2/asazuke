@@ -168,6 +168,12 @@ class AsazukeSiteScan
      */
     public function getHref($html){
       // 2 phpQueryのドキュメントオブジェクトを生成
+      $html = $this->text2utf8($html);
+echo $html;
+if(stristr($html, 'http-equiv="refresh"')){
+     AsazukeUtil::logE("metarefresh", 'html -> ' .preg_replace('/(?:\n|\r|\r\n)/', '', $html));
+$html = '<html><head></head><body></body></html>';
+}
       $doc = \phpQuery::newDocument($html);
       $aryA = array();
       // foreach ($doc["a"] as $a) {
