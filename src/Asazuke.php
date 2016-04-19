@@ -86,15 +86,7 @@ class Asazuke
 
                 if (!function_exists('tidy_parse_string'))
                 {
-                    echo <<< EOF
-tidy_parse_string()が使えません。
-
-※下記のコマンドを実行してインストールして下さい。
-$ brew install tidy-html5
-$ brew install php5?-tidy
-
-
-EOF;
+                    AsazukeMessage::error_tidy();
                 }
 
                 // ソースの取得

@@ -38,7 +38,7 @@ class AsazukeConf extends AsazukeConfGeneral
         '* description' => 'meta[name="description"]',
         '* category_top_flg' => '', // Pickles2側で使用
         '* **delete_flg' => '', // Pickles2側で使用
-                               // ↓↓↓optional
+        // ↓↓↓optional
         '* og:title' => 'meta[property="og:title"]',
         '* og:description' => 'meta[property="og:description"]',
         '* og:image' => 'meta[property="og:image"]',
@@ -61,13 +61,13 @@ class AsazukeConf extends AsazukeConfGeneral
             'selector' => 'body',
             'scope' => 'outerHTML'
         ]
+        // ,
+        // [
+        // 'name' => 'innerHTMLのテスト',
+        // 'selector' => '.contents',
+        // 'scope' => 'innerHTML'
+        // ]
     ]
-    // ,
-    // [
-    // 'name' => 'innerHTMLのテスト',
-    // 'selector' => '.contents',
-    // 'scope' => 'innerHTML'
-    // ]
     ;
 
     /**
