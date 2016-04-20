@@ -53,7 +53,6 @@ class AsazukeDB
 CREATE TABLE IF NOT EXISTS t_asazukeSS (
     id INTEGER PRIMARY KEY,
     fullPath TEXT UNIQUE,
-    depth INTEGER,
     checkCount INTEGER,
     status TEXT,
     statusCode INTEGER,
@@ -224,13 +223,11 @@ EOD;
             $sql = <<<EOD
 INSERT INTO t_asazukeSS (
     fullPath,
-    depth,
     checkCount,
     status,
     statusCode
 ) VALUES (
     :fullPath,
-    :depth,
     :checkCount,
     :status,
     :statusCode
@@ -241,7 +238,7 @@ EOD;
 
             // Bind parameters to statement variables
             $stmt->bindParam(':fullPath', $fullPath);
-            $stmt->bindParam(':depth', $depth);
+            // $stmt->bindParam(':depth', $depth);
             $stmt->bindParam(':checkCount', $checkCount);
             $stmt->bindParam(':status', $status);
             $stmt->bindParam(':statusCode', $statusCode);
@@ -250,7 +247,7 @@ EOD;
             foreach ($aryData as $key) {
                 // Set values to bound variables
                 $fullPath = $key['fullPath'];
-                $depth = $key['depth'];
+                // $depth = $key['depth'];
                 $checkCount = $key['checkCount'];
                 $status = $key['status'];
                 $statusCode = $key['statusCode'];

@@ -35,21 +35,22 @@ class AsazukeSiteScan
     {
         $cID = 1;
         $path = AsazukeConf::$startPath;
-        // echo $path.PHP_EOL;
-        $this->oneFileExec($path);
-        
+        echo $path.PHP_EOL;
+
         $AsazukeSiteScanDB = new AsazukeDB();
         $aryData = array();
         $key = array();
         $key['fullPath'] = AsazukeConf::$startPath;
-        $key['depth'] = 1; // 使っていないプロパティなのでとりあえず1
+        // $key['depth'] = 1; // 使っていないプロパティなのでとりあえず1
         $key['checkCount'] = 0;
-        $key['status'] = $response[0];
-        $key['statusCode'] = $response['reponse_code'];
+        $key['status'] = "HTTP/1.1 200 OK";
+        $key['statusCode'] = "200";
         $aryData[] = $key;
 
         $lastInsertId = $AsazukeSiteScanDB->insert($aryData);
-
+        
+        $this->oneFileExec($path);
+// exit;
         
         while (true) {
 
@@ -66,10 +67,14 @@ var_dump($cID);
                 // 進捗表示
                 $progress = $AsazukeSiteScanDB->getSiteScanProgress();
                 $this->console->out (PHP_EOL. $progress);
+                
+                var_dump($result);
 
                 if (! $result || count($result) == 0) {
+                  // echo "終了!";
                     break;
                 } else {
+                  // echo "継続!";
                   // echo "NEXT", print_r($result, true);
                     AsazukeUtil::logV("NEXT", print_r($result, true));
                     $path = $result[0]['fullPath'];
@@ -239,8 +244,8 @@ var_dump($doc->charset);
       $filterAryA = array_filter($aryA, "strlen"); // 空配列を削除
       $sortAryA = array_unique($filterAryA, SORT_STRING); // 重複削除
       asort($sortAryA, SORT_STRING); // ソート
-      // echo "---------------";
-      // var_dump($sortAryA);
+      echo "---------------";
+      var_dump($sortAryA);
       return $sortAryA;
     }
 
@@ -454,7 +459,7 @@ var_dump($doc->charset);
 
                     AsazukeUtil::logV('', '絶対パスなどを処理');
                     $paths = array_values(array_filter(explode('/', $v)));
-                    AsazukeUtil::logV("Depth", count($paths));
+                    // AsazukeUtil::logV("Depth", count($paths));
                 }
                 AsazukeUtil::logV('', 'AsazukeConf::$startDir配下のディレクトリか判定する。');
                 $urlPath = parse_url($v, PHP_URL_PATH);
@@ -471,11 +476,11 @@ var_dump($doc->charset);
                 $aryData = array();
                 $key = array();
                 $key['fullPath'] = $v;
-                if(!isset($paths)){
-                    $key['depth'] = 1; // 使っていないプロパティなのでとりあえず1
-                }else{
-                    $key['depth'] = count($paths);
-                }
+                // if(!isset($paths)){
+                //     $key['depth'] = 1; // 使っていないプロパティなのでとりあえず1
+                // }else{
+                //     $key['depth'] = count($paths);
+                // }
                 
                 $key['checkCount'] = 0;
                 $key['status'] = $response[0];
