@@ -69,7 +69,7 @@ class AsazukeSiteScan
             {
                 $AsazukeSiteScanDB = new AsazukeDB();
                 $AsazukeSiteScanDB->updateChecked($cID); // 開始ID
-                $result = $AsazukeSiteScanDB->select('checkCount=0 limit 1');
+                $result = $AsazukeSiteScanDB->select('checkCount=0 and status = \'HTTP/1.1 200 OK\' limit 1');
 
                 // 進捗表示
                 $progress = $AsazukeSiteScanDB->getSiteScanProgress();
