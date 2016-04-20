@@ -117,7 +117,7 @@ EOD;
     {
         $sql = <<<EOD
 SELECT T1.count || " / " || T2.count AS PROGRESS FROM
-(SELECT count(id) AS count FROM t_asazukeSS WHERE checkCount=1) AS T1 LEFT JOIN
+(SELECT count(id) AS count FROM t_asazukeSS WHERE checkCount>0) AS T1 LEFT JOIN
 (SELECT count(id) AS count FROM t_asazukeSS) AS T2
 EOD;
         $stmt = $this->file_db->query($sql);
