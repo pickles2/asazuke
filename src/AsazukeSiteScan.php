@@ -191,15 +191,13 @@ class AsazukeSiteScan
       // 2 phpQueryのドキュメントオブジェクトを生成
       // $html = $this->text2utf8($html);
 
-      if(stristr($html, 'http-equiv="refresh"')){
-          AsazukeUtil::logE("metarefresh", 'html -> ' .preg_replace('/(?:\n|\r|\r\n)/', '', $html));
-          $html = '<html><head></head><body></body></html>';
-      }
+      // if(stristr($html, 'http-equiv="refresh"')){
+      //     AsazukeUtil::logE("metarefresh", 'html -> ' .preg_replace('/(?:\n|\r|\r\n)/', '', $html));
+      //     $html = '<html><head></head><body></body></html>';
+      // }
 
-
-
-
-      $doc = \phpQuery::newDocument($html);
+      // $doc = \phpQuery::newDocument($html);
+      $doc = \phpQuery::newDocumentHTML($html);
       
       // phpQueryでcontent charsetが取れる
       var_dump($doc->document->encoding);

@@ -21,7 +21,7 @@ class AsazukeConfGeneral
 
     public static $buildInServerPort = '49150';
 
-    public static $isDebuggable = true;
+    public static $isDebuggable = false;
 
     // 'ディレクトリ名' と 'ディレクトリ名/'を別ものとしてチェックする。検索ヒット数が約２倍に増える、falseの場合はhrefを辿るだけ
     public static $isInsistently = false;
