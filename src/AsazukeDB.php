@@ -256,7 +256,7 @@ EOD;
 
                 // last insert id
                 $lastInsertId = $this->file_db->lastInsertId();
-                return $lastInsertId;
+                return $lastInsertId; // 正常系
             }
         } catch (\PDOException $e) {
           if($e->getCode() == 23000){
@@ -264,9 +264,9 @@ EOD;
           }else{
             echo "Statement failed: " . $e->getMessage(). "\n";
           }
-            return 1;
+            return 0; // 異常系
         }
-        return 0;
+        return 0; // 異常系
     }
 
     /**
