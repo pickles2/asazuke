@@ -37,15 +37,29 @@ class AsazukeSiteScan
         $path = AsazukeConf::$startPath;
         // echo $path.PHP_EOL;
         $this->oneFileExec($path);
+        
+        $AsazukeSiteScanDB = new AsazukeDB();
+        $aryData = array();
+        $key = array();
+        $key['fullPath'] = AsazukeConf::$startPath;
+        $key['depth'] = 1; // 使っていないプロパティなのでとりあえず1
+        $key['checkCount'] = 0;
+        $key['status'] = $response[0];
+        $key['statusCode'] = $response['reponse_code'];
+        $aryData[] = $key;
+
+        $lastInsertId = $AsazukeSiteScanDB->insert($aryData);
+
+        
         while (true) {
 
             $time_start = microtime(true) * 1000;
 
             // ここに実行処理(開始）
             {
-
-
-                $AsazukeSiteScanDB = new AsazukeDB();
+$AsazukeSiteScanDB = new AsazukeDB();
+var_dump($cID);
+                // $AsazukeSiteScanDB = new AsazukeDB();
                 $AsazukeSiteScanDB->updateChecked($cID); // 開始ID
                 $result = $AsazukeSiteScanDB->select('checkCount=0 limit 1');
 
@@ -168,13 +182,26 @@ class AsazukeSiteScan
      */
     public function getHref($html){
       // 2 phpQueryのドキュメントオブジェクトを生成
-      $html = $this->text2utf8($html);
-echo $html;
+      // $html = $this->text2utf8($html);
+// echo "getHref"."\n";
+// echo $html;
 if(stristr($html, 'http-equiv="refresh"')){
      AsazukeUtil::logE("metarefresh", 'html -> ' .preg_replace('/(?:\n|\r|\r\n)/', '', $html));
-$html = '<html><head></head><body></body></html>';
+     $html = '<html><head></head><body></body></html>';
 }
+
+
+
+
       $doc = \phpQuery::newDocument($html);
+      
+var_dump($doc->document->encoding);
+var_dump($doc->charset);
+
+// shift_jis -> sjis-win
+// euc-jp -> 
+// iso-2022-jp JIS
+
       $aryA = array();
       // foreach ($doc["a"] as $a) {
       //     $link = pq($a)->attr('href');
@@ -208,6 +235,7 @@ $html = '<html><head></head><body></body></html>';
           }
         }
       }
+      
       $filterAryA = array_filter($aryA, "strlen"); // 空配列を削除
       $sortAryA = array_unique($filterAryA, SORT_STRING); // 重複削除
       asort($sortAryA, SORT_STRING); // ソート
@@ -262,16 +290,27 @@ $html = '<html><head></head><body></body></html>';
      * なんでもUTF-8に変換
      */
     public function text2utf8($text){
-        $nkfpath = '/usr/local/bin/nkf';
-        //$text = preg_replace('/(?:\n|\r|\r\n)/','',$text);
-        $text = '"'.mb_ereg_replace("\"", '\"', $text).'"';
-        $command = popen("echo $text | $nkfpath -w -Lu ","r");
+        // $nkfpath = '/usr/local/bin/nkf';
+        // //$text = preg_replace('/(?:\n|\r|\r\n)/','',$text);
+        // $text = '"'.mb_ereg_replace("\"", '\"', $text).'"';
+        // $command = popen("echo $text | $nkfpath -w -Lu ","r");
+        // $result = "";
+        // while (!feof($command)) {
+        //     $result .= fgets($command);
+        // }
+        // pclose($command);
+        // return $result;
+        
+        // Windowsでも使えるようにするためnkfは使わない(nkf.exeは心配なので)
+        // CP51932 ≒ eucJP-ms
         $result = "";
-        while (!feof($command)) {
-            $result .= fgets($command);
+        $cp = "";
+        if($text){
+          mb_language("Japanese");
+          $cp = mb_detect_encoding($text, "ASCII,JIS,UTF-8,CP51932,SJIS-win", true);
+          $result = mb_convert_encoding($text, "UTF-8", $cp);
         }
-        pclose($command);
-        return $result;
+        return array($result, $cp);
     }
     
     /**
@@ -319,16 +358,19 @@ $html = '<html><head></head><body></body></html>';
           // \phpQuery::newDocument($html); でfatal errorがでる場合があるので事前チェックを実施
           echo 'loadHTML:::.'."\n";
           // 文字コード変換(utf8化)
-          $html = $this->text2utf8($html);
-          $bool = \DOMDocument::loadHTML($html);
+          // $ary = $this->text2utf8($html);
+          // $html = $ary[0];
+          // $cp =  $ary[1];
           
-          if(!$bool){
-            echo "Skip -> ".$url. ' message:htmlとして処理出来ませんでした。';
-            //return true;
-          }
+          // $bool = \DOMDocument::loadHTML($html);
+          // if(!$bool){
+          //   echo "Skip -> ".$url. ' message:htmlとして処理出来ませんでした。';
+          //   //return true;
+          // }
             
 
             $sortAryA = $this->getHref($html);
+            // var_dump($sortAryA);
 
 
             $AsazukeSiteScanDB = new AsazukeDB();
@@ -441,6 +483,7 @@ $html = '<html><head></head><body></body></html>';
                 $unitTestResult['validLinks'][] = $key;
                 $aryData[] = $key;
 
+var_dump($aryData);
                 $lastInsertId = $AsazukeSiteScanDB->insert($aryData);
 
                 if($lastInsertId > 0){

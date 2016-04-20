@@ -185,14 +185,14 @@ echo $url;
                 // $aryAsazuke[] = $key;
                 $key['filePath'] = "";
                 $key['message'] = "";
-                $key['title'] = "";
-                $key['h1'] = "";
-                $key['h2'] = "";
-                $key['h3'] = "";
-                $key['breadCrumb'] = "";
-                $key['meta'] = "";
-                $key['errorCount'] = "";
-                $key['warningCount'] = "";
+                // $key['title'] = "";
+                // $key['h1'] = "";
+                // $key['h2'] = "";
+                // $key['h3'] = "";
+                // $key['breadCrumb'] = "";
+                // $key['meta'] = "";
+                // $key['errorCount'] = "";
+                // $key['warningCount'] = "";
                 $aryAsazuke[] = $key;
 
                 $lastInsertId = $AsazukeDB->insertAsazuke($aryAsazuke);
@@ -208,16 +208,16 @@ echo $url;
 
                 // $tidy = null;
 
-                $buffer = "";
-                $buffer .= $url . "\n";
-                $buffer .= "Error:" . count($matchesErr) . "\n";
-                $buffer .= "\nWarning:" . count($matchesWar) . "\n";
-                $buffer .= "処理件数:" . ++ $ci . "\n";
-                if(AsazukeConf::$ctrlCd){
-                  $this->console->out($buffer);
-                }else{
-                  echo $buffer;
-                }
+                // $buffer = "";
+                // $buffer .= $url . "\n";
+                // $buffer .= "Error:" . count($matchesErr) . "\n";
+                // $buffer .= "\nWarning:" . count($matchesWar) . "\n";
+                // $buffer .= "処理件数:" . ++ $ci . "\n";
+                // if(AsazukeConf::$ctrlCd){
+                //   $this->console->out($buffer);
+                // }else{
+                //   echo $buffer;
+                // }
             }
             // ここに実行処理(終了）
 
