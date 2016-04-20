@@ -211,7 +211,6 @@ EOD;
     public function insert($aryData)
     {
         try {
-          // var_dump($aryData[0]);
           $fullPath = $aryData[0]['fullPath'];
           $result = $this->select('fullPath=\''+ $fullPath+ '\' limit 1');
           if ($result || count($result) > 0) {
@@ -260,7 +259,11 @@ EOD;
                 return $lastInsertId;
             }
         } catch (\PDOException $e) {
-            echo "Statement failed: " . $e->getMessage();
+          if($e->getCode() == 23000){
+            echo "既に登録済みのPATHです。: " . $fullPath. "\n";
+          }else{
+            echo "Statement failed: " . $e->getMessage(). "\n";
+          }
             return 1;
         }
         return 0;
@@ -307,8 +310,6 @@ EOD;
         $currentCount = (int) $result[0]['checkCount'];
         AsazukeUtil::logV("PATH", $path);
         AsazukeUtil::logV("currentCount", $currentCount);
-
-echo '$id:'. "$id"."\n";
 
         $sql = <<<EOD
 UPDATE t_asazukeSS SET

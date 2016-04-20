@@ -36,21 +36,30 @@ class AsazukeSiteScan
         $cID = 1;
         $path = AsazukeConf::$startPath;
         echo $path.PHP_EOL;
+        
 
         $AsazukeSiteScanDB = new AsazukeDB();
         $aryData = array();
         $key = array();
-        $key['fullPath'] = AsazukeConf::$startPath;
-        // $key['depth'] = 1; // 使っていないプロパティなのでとりあえず1
-        $key['checkCount'] = 0;
-        $key['status'] = "HTTP/1.1 200 OK";
-        $key['statusCode'] = "200";
-        $aryData[] = $key;
-
-        $lastInsertId = $AsazukeSiteScanDB->insert($aryData);
         
-        $this->oneFileExec($path);
-// exit;
+        $mst = AsazukeConf::$url;
+        $_url = AsazukeUtil::getResolvePath($path, $mst, $path);
+        extract($this->checkStatusCode($_url), EXTR_OVERWRITE);
+        if($statusCode !== AsazukeMessage::$CD_2XX){
+          AsazukeUtil::logV('', '2XX以外は処理を中断する。');
+          echo "開始URL:".$_url."が不正です。"."\n";
+          return $statusCode;
+        }else{
+          $key['fullPath'] = AsazukeConf::$startPath;
+          $key['checkCount'] = 0;
+          $key['status'] = "initial"; // "HTTP/1.1 200 OK"になるはず
+          $key['statusCode'] = $statusCode;
+          $aryData[] = $key;
+
+          $lastInsertId = $AsazukeSiteScanDB->insert($aryData);
+          
+          $this->oneFileExec($path);
+        }
         
         while (true) {
 
@@ -58,9 +67,7 @@ class AsazukeSiteScan
 
             // ここに実行処理(開始）
             {
-$AsazukeSiteScanDB = new AsazukeDB();
-var_dump($cID);
-                // $AsazukeSiteScanDB = new AsazukeDB();
+                $AsazukeSiteScanDB = new AsazukeDB();
                 $AsazukeSiteScanDB->updateChecked($cID); // 開始ID
                 $result = $AsazukeSiteScanDB->select('checkCount=0 limit 1');
 
@@ -68,14 +75,9 @@ var_dump($cID);
                 $progress = $AsazukeSiteScanDB->getSiteScanProgress();
                 $this->console->out (PHP_EOL. $progress);
                 
-                var_dump($result);
-
                 if (! $result || count($result) == 0) {
-                  // echo "終了!";
                     break;
                 } else {
-                  // echo "継続!";
-                  // echo "NEXT", print_r($result, true);
                     AsazukeUtil::logV("NEXT", print_r($result, true));
                     $path = $result[0]['fullPath'];
                     $this->oneFileExec($path); // ここで実行
@@ -188,25 +190,25 @@ var_dump($cID);
     public function getHref($html){
       // 2 phpQueryのドキュメントオブジェクトを生成
       // $html = $this->text2utf8($html);
-// echo "getHref"."\n";
-// echo $html;
-if(stristr($html, 'http-equiv="refresh"')){
-     AsazukeUtil::logE("metarefresh", 'html -> ' .preg_replace('/(?:\n|\r|\r\n)/', '', $html));
-     $html = '<html><head></head><body></body></html>';
-}
+
+      if(stristr($html, 'http-equiv="refresh"')){
+          AsazukeUtil::logE("metarefresh", 'html -> ' .preg_replace('/(?:\n|\r|\r\n)/', '', $html));
+          $html = '<html><head></head><body></body></html>';
+      }
 
 
 
 
       $doc = \phpQuery::newDocument($html);
       
-var_dump($doc->document->encoding);
-var_dump($doc->charset);
-
-// shift_jis -> sjis-win
-// euc-jp -> 
-// iso-2022-jp JIS
-
+      // phpQueryでcontent charsetが取れる
+      var_dump($doc->document->encoding);
+      var_dump($doc->charset);
+      // shift_jis -> sjis-win
+      // euc-jp -> CP51932
+      // iso-2022-jp -> JIS
+      
+      
       $aryA = array();
       // foreach ($doc["a"] as $a) {
       //     $link = pq($a)->attr('href');
@@ -244,8 +246,8 @@ var_dump($doc->charset);
       $filterAryA = array_filter($aryA, "strlen"); // 空配列を削除
       $sortAryA = array_unique($filterAryA, SORT_STRING); // 重複削除
       asort($sortAryA, SORT_STRING); // ソート
-      echo "---------------";
-      var_dump($sortAryA);
+      // echo "---------------";
+      // var_dump($sortAryA);
       return $sortAryA;
     }
 
@@ -488,7 +490,6 @@ var_dump($doc->charset);
                 $unitTestResult['validLinks'][] = $key;
                 $aryData[] = $key;
 
-var_dump($aryData);
                 $lastInsertId = $AsazukeSiteScanDB->insert($aryData);
 
                 if($lastInsertId > 0){
