@@ -44,19 +44,29 @@ class AsazukeSiteScan
         
         $mst = AsazukeConf::$url;
         $_url = AsazukeUtil::getResolvePath($path, $mst, $path);
-        extract($this->checkStatusCode($_url), EXTR_OVERWRITE);
-        if($statusCode !== AsazukeMessage::$CD_2XX){
+        $data = AsazukeUtil::http_file_get_contents($_url, $response);
+        var_dump($response);
+        var_dump($response['reponse_code']);
+        if ($response['reponse_code'] !== 200) {
+
+        //extract($this->checkStatusCode($_url), EXTR_OVERWRITE);
           AsazukeUtil::logV('', '2XX以外は処理を中断する。');
           echo "開始URL:".$_url."が不正です。"."\n";
           return $statusCode;
         }else{
           $key['fullPath'] = AsazukeConf::$startPath;
           $key['checkCount'] = 0;
-          $key['status'] = "initial"; // "HTTP/1.1 200 OK"になるはず
-          $key['statusCode'] = $statusCode;
+          $key['status'] = $response[0]; //"HTTP/1.1 200 OK"になるはず
+          $key['statusCode'] = $response['reponse_code'];
           $aryData[] = $key;
 
           $lastInsertId = $AsazukeSiteScanDB->insert($aryData);
+
+          if($lastInsertId > 0){
+            // insertに成功したデータ
+            $aryData[0]['id'] = $lastInsertId;
+            echo "Result -> ".json_encode($aryData[0], JSON_UNESCAPED_UNICODE).PHP_EOL;
+          }
           
           $this->oneFileExec($path);
         }
@@ -195,6 +205,8 @@ class AsazukeSiteScan
       //     AsazukeUtil::logE("metarefresh", 'html -> ' .preg_replace('/(?:\n|\r|\r\n)/', '', $html));
       //     $html = '<html><head></head><body></body></html>';
       // }
+      //
+            
 
       // $doc = \phpQuery::newDocument($html);
       $doc = \phpQuery::newDocumentHTML($html);

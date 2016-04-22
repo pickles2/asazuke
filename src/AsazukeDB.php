@@ -432,7 +432,12 @@ EOD;
             // $warningCount = $key['warningCount'];
 
             // Execute statement
+        try{
             $stmt->execute();
+        } catch (\PDOException $e) {
+            // Print PDOException message
+            echo $e->getMessage();
+        }
 
             // last insert id
             $lastInsertId = $this->file_db->lastInsertId();

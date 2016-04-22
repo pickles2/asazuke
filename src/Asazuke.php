@@ -15,16 +15,26 @@ class Asazuke
      * なんでもUTF-8に変換
      */
     public function text2utf8($text){
-        $nkfpath = '/usr/local/bin/nkf';
-        //$text = preg_replace('/(?:\n|\r|\r\n)/','',$text);
-        $text = '"'.mb_ereg_replace("\"", '\"', $text).'"';
-        $command = popen("echo $text | $nkfpath -w -Lu ","r");
+        //$nkfpath = '/usr/local/bin/nkf';
+        ////$text = preg_replace('/(?:\n|\r|\r\n)/','',$text);
+        //$text = '"'.mb_ereg_replace("\"", '\"', $text).'"';
+        //$command = popen("echo $text | $nkfpath -w -Lu ","r");
+        //$result = "";
+        //while (!feof($command)) {
+        //    $result .= fgets($command);
+        //}
+        //pclose($command);
+        //return $result;
+
         $result = "";
-        while (!feof($command)) {
-            $result .= fgets($command);
+        $cp = "";
+        if($text){
+          mb_language("Japanese");
+          $cp = mb_detect_encoding($text, "ASCII,JIS,UTF-8,CP51932,SJIS-win", true);
+          echo $cp;
+          $result = mb_convert_encoding($text, "UTF-8", $cp);
         }
-        pclose($command);
-        return $result;
+        return array($result, $cp);
     }
     public $csvColmns = array(
         'massage',
@@ -183,8 +193,8 @@ echo $url;
                 // $key['errorCount'] = count($matchesErr);
                 // $key['warningCount'] = count($matchesWar);
                 // $aryAsazuke[] = $key;
-                $key['filePath'] = "";
-                $key['message'] = "";
+                $key['filePath'] = $path;
+                //$key['message'] = "";
                 // $key['title'] = "";
                 // $key['h1'] = "";
                 // $key['h2'] = "";
@@ -368,8 +378,9 @@ echo $url;
             $pattern = '/Warning:/';
             $matchesWar = preg_grep($pattern, AsazukeUtil::str2array($tidy->errorBuffer));
 
-      $html = $this->text2utf8($html);
-            $doc = \phpQuery::newDocument($html);
+      //$html = $this->text2utf8($html);
+           // $doc = \phpQuery::newDocument($html);
+            $doc = \phpQuery::newDocumentHTML($html);
 
             $aryHref = array();
             foreach ($doc["link"] as $elem) {
@@ -431,6 +442,7 @@ echo $url;
             '\\'
         );
         $p = 0;
+
         foreach ($result as $data) {
             echo "\r" . $pg[++ $p % count($pg)];
 
@@ -442,17 +454,21 @@ echo $url;
                 continue;
             }
 
-            $cssWorksFile = AsazukeUtil::getDatPath($id, AsazukeConf::getCss());
+            $cssWorksFile = AsazukeUtil::getDatPath($id, AsazukeConf::getHtml());
 
             // echo $path . "\n";
             // echo $cssWorksFile . "\n";
             {
                 $html = file_get_contents($cssWorksFile);
-                $tidy = tidy_parse_string($html, array(), AsazukeConf::$tidyEncoding);
-                $tidy->cleanRepair();
+                //$tidy = tidy_parse_string($html, array(), AsazukeConf::$tidyEncoding);
+                //$tidy->cleanRepair();
 
-      $html = $this->text2utf8($html);
-                $doc = \phpQuery::newDocument($html);
+     // $ary = $this->text2utf8($html);
+     //           $html = $ary[0];
+     //           echo $html;
+                //$doc = \phpQuery::newDocument($html);
+                $doc = \phpQuery::newDocumentHTML($html);
+                //var_dump($doc);
 
                 // キーを指定して、配列を値で埋める
                 $csvRowData = array_fill_keys($aryCsvColNames, '');
@@ -623,8 +639,9 @@ echo $url;
                 $tidy = tidy_parse_string($html, array(), AsazukeConf::$tidyEncoding);
                 $tidy->cleanRepair();
 
-      $html = $this->text2utf8($html);
-                $doc = \phpQuery::newDocument($html);
+      //$html = $this->text2utf8($html);
+                //$doc = \phpQuery::newDocument($html);
+                $doc = \phpQuery::newDocumentHTML($html);
 
                 $newPath = AsazukeUtil::getDatPath($id, AsazukeConf::getScrapingHtml());
                 // $stream = fopen($newPath, 'w');
@@ -670,8 +687,9 @@ echo $url;
                           $r_tidy = tidy_parse_string($html, array(), AsazukeConf::$tidyEncoding);
                           $r_tidy->cleanRepair();
 
-      $html = $this->text2utf8($html);
-                          $r_doc = \phpQuery::newDocument($html);
+      //$html = $this->text2utf8($html);
+                          //$r_doc = \phpQuery::newDocument($html);
+                          $doc = \phpQuery::newDocumentHTML($html);
                           $r_aryHref = array();
                           //$arySrc = array();
                           foreach ($r_doc["*"] as $r_elem) {
@@ -713,8 +731,9 @@ echo $url;
                     try {
                         // 画像などのリソースなどもダウンロードする
                         $html = file_get_contents($newFile);
-      $html = $this->text2utf8($html);
-                        $doc = \phpQuery::newDocument($html);
+      //$html = $this->text2utf8($html);
+                        //$doc = \phpQuery::newDocument($html);
+                        $doc = \phpQuery::newDocumentHTML($html);
                         foreach ($doc["img"] as $img) {
                             $imgPath = pq($img)->attr('src');
                             $v = parse_url($imgPath);
