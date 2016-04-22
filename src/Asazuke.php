@@ -4,38 +4,13 @@
  */
 namespace Mshiba\Px2lib\Asazuke;
 
-$D = dirname(__FILE__);
-require_once ($D . '/libs/phpQuery-onefile.php');
+//$D = dirname(__FILE__);
+//require_once ($D . '/libs/phpQuery-onefile.php');
 
 class Asazuke
 {
     private $console;
 
-    /**
-     * なんでもUTF-8に変換
-     */
-    public function text2utf8($text){
-        //$nkfpath = '/usr/local/bin/nkf';
-        ////$text = preg_replace('/(?:\n|\r|\r\n)/','',$text);
-        //$text = '"'.mb_ereg_replace("\"", '\"', $text).'"';
-        //$command = popen("echo $text | $nkfpath -w -Lu ","r");
-        //$result = "";
-        //while (!feof($command)) {
-        //    $result .= fgets($command);
-        //}
-        //pclose($command);
-        //return $result;
-
-        $result = "";
-        $cp = "";
-        if($text){
-          mb_language("Japanese");
-          $cp = mb_detect_encoding($text, "ASCII,JIS,UTF-8,CP51932,SJIS-win", true);
-          echo $cp;
-          $result = mb_convert_encoding($text, "UTF-8", $cp);
-        }
-        return array($result, $cp);
-    }
     public $csvColmns = array(
         'massage',
         'filepath'
@@ -91,12 +66,9 @@ class Asazuke
      */
     public function exec($aryCsv)
     {
+        // 何も処理しないでファイルのダウンロードを行う
         $this->console = new AsazukeUtilConsole();
         $AsazukeDB = new AsazukeDB();
-
-        // TODO
-        // $result = $AsazukeDB->selectAsazuke('id=1');
-        // var_dump($result);
 
         $ci = 0;
         foreach ($aryCsv as $recoad) {
@@ -116,122 +88,21 @@ class Asazuke
 
                 // ソースの取得
                 $url = AsazukeConf::$url . $path;
-echo $url;
-                // $html = file_get_contents($url);
                 $html = AsazukeUtil::http_file_get_contents($url, $response);
-                // $tidy = tidy_parse_string($html, array(), AsazukeConf::$tidyEncoding);
-                // $tidy->cleanRepair();
 
-                // $pattern = '/Error:/';
-                // $matchesErr = preg_grep($pattern, AsazukeUtil::str2array($tidy->errorBuffer));
-
-                // $pattern = '/Warning:/';
-                // $matchesWar = preg_grep($pattern, AsazukeUtil::str2array($tidy->errorBuffer));
-
-
-
-                // /*
-                //  * tidy_diagnose(パース・解析）
-                //  * パースした状態からの検証
-                //  */
-                // // $tidy->diagnose();
-                // // echo $tidy->errorBuffer;
-
-                // // 2 phpQueryのドキュメントオブジェクトを生成
-      // $html = $this->text2utf8($html);
-                // $doc = \phpQuery::newDocument($html);
-
-                // // 4 meta要素内のテキストを表示
-                // $aryMeta = array();
-                // foreach ($doc["meta"] as $meta) {
-                //     $key = pq($meta)->attr('name');
-                //     $value = pq($meta)->attr('content');
-                //     $aryMeta[$key] = $value;
-                // }
-
-                // echo $url . "\n";
-                // echo "\nError:" . count($matchesErr) . "";
-                // echo "\nWarning:" . count($matchesWar) . "";
-                // echo "\n";
-                // print_r($matchesWar);
-
-                // // 3 title要素内のテキストを表示
-                // echo "\n<title>:" . $doc["title"]->text();
-
-                // echo "\n<meta>:";
-                // // var_dump($aryMeta);
-                // echo serialize($aryMeta);
-
-                // echo "\n<h1>:";
-                // echo serialize(AsazukeUtil::str2array($doc["h1"]));
-
-                // echo "\n<h2>:";
-                // echo serialize(AsazukeUtil::str2array($doc["h2"]));
-
-                // echo "\n<h3>:";
-                // echo serialize(AsazukeUtil::str2array($doc["h3"]));
-
-                // echo "\n#BREADCRUMBS:";
-                // echo AsazukeUtil::stripReturn((string) $doc["#BREADCRUMBS"]);
-
-                // echo (str_repeat('_', 40));
-                // }
-                // exit();
-                // Set values to bound variables
                 $aryAsazuke = array();
                 $key = array();
-                // $key['filePath'] = $path;
-                // $key['message'] = $message;
-                // $key['title'] = $doc["title"]->text();
-                // $key['h1'] = serialize(AsazukeUtil::str2array($doc["h1"]));
-                // $key['h2'] = serialize(AsazukeUtil::str2array($doc["h2"]));
-                // $key['h3'] = serialize(AsazukeUtil::str2array($doc["h3"]));
-                // $key['breadCrumb'] = serialize(array(
-                //     AsazukeUtil::stripReturn((string) $doc["#BREADCRUMBS"])
-                // ));
-                // $key['meta'] = serialize($aryMeta);
-                // $key['errorCount'] = count($matchesErr);
-                // $key['warningCount'] = count($matchesWar);
-                // $aryAsazuke[] = $key;
                 $key['filePath'] = $path;
-                //$key['message'] = "";
-                // $key['title'] = "";
-                // $key['h1'] = "";
-                // $key['h2'] = "";
-                // $key['h3'] = "";
-                // $key['breadCrumb'] = "";
-                // $key['meta'] = "";
-                // $key['errorCount'] = "";
-                // $key['warningCount'] = "";
                 $aryAsazuke[] = $key;
 
                 $lastInsertId = $AsazukeDB->insertAsazuke($aryAsazuke);
-                // $datPath = AsazukeUtil::getDatPath($lastInsertId, AsazukeConf::getDat());
                 $htmlPath = AsazukeUtil::getDatPath($lastInsertId, AsazukeConf::getHtml());
                 $AsazukeUtilFile = new AsazukeUtilFile($htmlPath, true);
-                // echo $AsazukeUtilFile->getFileName();
 
                 $AsazukeUtilFile->out($html);
-
-                // $fileLog = new AsazukeUtilFile($datPath);
-                // $fileLog->out($tidy->errorBuffer);
-
-                // $tidy = null;
-
-                // $buffer = "";
-                // $buffer .= $url . "\n";
-                // $buffer .= "Error:" . count($matchesErr) . "\n";
-                // $buffer .= "\nWarning:" . count($matchesWar) . "\n";
-                // $buffer .= "処理件数:" . ++ $ci . "\n";
-                // if(AsazukeConf::$ctrlCd){
-                //   $this->console->out($buffer);
-                // }else{
-                //   echo $buffer;
-                // }
             }
             // ここに実行処理(終了）
-
-
+            
             $Sec_1 = 100 * 10000;
             $wait = $Sec_1 / AsazukeConf::$execPerSecond;
             $time_end = microtime(true) * 1000;
@@ -378,7 +249,6 @@ echo $url;
             $pattern = '/Warning:/';
             $matchesWar = preg_grep($pattern, AsazukeUtil::str2array($tidy->errorBuffer));
 
-      //$html = $this->text2utf8($html);
            // $doc = \phpQuery::newDocument($html);
             $doc = \phpQuery::newDocumentHTML($html);
 
@@ -463,7 +333,6 @@ echo $url;
                 //$tidy = tidy_parse_string($html, array(), AsazukeConf::$tidyEncoding);
                 //$tidy->cleanRepair();
 
-     // $ary = $this->text2utf8($html);
      //           $html = $ary[0];
      //           echo $html;
                 //$doc = \phpQuery::newDocument($html);
@@ -567,7 +436,6 @@ echo $url;
                       echo '上記以外のCSSセレクタを処理:'. $cssSelector .":". pq($doc[$cssSelector])->attr('content')."\n";
                     }
                 }
-
                 // var_dump($csvRowData);
                 // fwrite($stream, mb_convert_encoding(implode(',', AsazukeUtil::arrayQuote($csvRowData)), 'SJIS-win', 'UTF-8') . "\r\n");
                 $AsazukeUtilFile->out(mb_convert_encoding(implode(',', AsazukeUtil::arrayQuote($csvRowData)), $encoding, 'UTF-8') . $linefeed, true);
@@ -639,7 +507,6 @@ echo $url;
                 $tidy = tidy_parse_string($html, array(), AsazukeConf::$tidyEncoding);
                 $tidy->cleanRepair();
 
-      //$html = $this->text2utf8($html);
                 //$doc = \phpQuery::newDocument($html);
                 $doc = \phpQuery::newDocumentHTML($html);
 
@@ -687,7 +554,6 @@ echo $url;
                           $r_tidy = tidy_parse_string($html, array(), AsazukeConf::$tidyEncoding);
                           $r_tidy->cleanRepair();
 
-      //$html = $this->text2utf8($html);
                           //$r_doc = \phpQuery::newDocument($html);
                           $doc = \phpQuery::newDocumentHTML($html);
                           $r_aryHref = array();
@@ -731,7 +597,6 @@ echo $url;
                     try {
                         // 画像などのリソースなどもダウンロードする
                         $html = file_get_contents($newFile);
-      //$html = $this->text2utf8($html);
                         //$doc = \phpQuery::newDocument($html);
                         $doc = \phpQuery::newDocumentHTML($html);
                         foreach ($doc["img"] as $img) {

@@ -29,7 +29,32 @@ class AsazukeUtil
         $fileLog = new AsazukeUtilFile(AsazukeConf::getLogPath());
         $fileLog->out("[Error] $tag " . self::stripReturn($text));
     }
-
+    
+    /**
+     * なんでもUTF-8に変換
+     */
+    public static function convertUtf8($text){
+      //$nkfpath = '/usr/local/bin/nkf';
+      ////$text = preg_replace('/(?:\n|\r|\r\n)/','',$text);
+      //$text = '"'.mb_ereg_replace("\"", '\"', $text).'"';
+      //$command = popen("echo $text | $nkfpath -w -Lu ","r");
+      //$result = "";
+      //while (!feof($command)) {
+      //    $result .= fgets($command);
+      //}
+      //pclose($command);
+      //return $result;
+    
+      $result = "";
+      $cp = "";
+      if($text){
+        mb_language("Japanese");
+        $cp = mb_detect_encoding($text, "ASCII,JIS,UTF-8,CP51932,SJIS-win", true);
+        echo $cp;
+        $result = mb_convert_encoding($text, "UTF-8", $cp);
+      }
+      return array($result, $cp);
+    }
     /**
      * "1st, 2nd, 3rd, 4th..."を返す
      *

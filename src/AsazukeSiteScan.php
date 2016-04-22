@@ -4,12 +4,11 @@
  */
 namespace Mshiba\Px2lib\Asazuke;
 
-$D = dirname(__FILE__);
-require_once ($D . '/libs/phpQuery-onefile.php');
+//$D = dirname(__FILE__);
+//require_once ($D . '/libs/phpQuery-onefile.php');
 
 class AsazukeSiteScan
 {
-
     private $console;
 
     /**
@@ -199,25 +198,9 @@ class AsazukeSiteScan
      */
     public function getHref($html){
       // 2 phpQueryのドキュメントオブジェクトを生成
-      // $html = $this->text2utf8($html);
-
-      // if(stristr($html, 'http-equiv="refresh"')){
-      //     AsazukeUtil::logE("metarefresh", 'html -> ' .preg_replace('/(?:\n|\r|\r\n)/', '', $html));
-      //     $html = '<html><head></head><body></body></html>';
-      // }
-      //
-            
-
+      
       // $doc = \phpQuery::newDocument($html);
       $doc = \phpQuery::newDocumentHTML($html);
-      
-      // phpQueryでcontent charsetが取れる
-      var_dump($doc->document->encoding);
-      var_dump($doc->charset);
-      // shift_jis -> sjis-win
-      // euc-jp -> CP51932
-      // iso-2022-jp -> JIS
-      
       
       $aryA = array();
       // foreach ($doc["a"] as $a) {
@@ -303,32 +286,6 @@ class AsazukeSiteScan
       AsazukeUtil::logV("pathClean", $v_org . ' -> ' . $v);
       return $v;
     }
-    /**
-     * なんでもUTF-8に変換
-     */
-    public function text2utf8($text){
-        // $nkfpath = '/usr/local/bin/nkf';
-        // //$text = preg_replace('/(?:\n|\r|\r\n)/','',$text);
-        // $text = '"'.mb_ereg_replace("\"", '\"', $text).'"';
-        // $command = popen("echo $text | $nkfpath -w -Lu ","r");
-        // $result = "";
-        // while (!feof($command)) {
-        //     $result .= fgets($command);
-        // }
-        // pclose($command);
-        // return $result;
-        
-        // Windowsでも使えるようにするためnkfは使わない(nkf.exeは心配なので)
-        // CP51932 ≒ eucJP-ms
-        $result = "";
-        $cp = "";
-        if($text){
-          mb_language("Japanese");
-          $cp = mb_detect_encoding($text, "ASCII,JIS,UTF-8,CP51932,SJIS-win", true);
-          $result = mb_convert_encoding($text, "UTF-8", $cp);
-        }
-        return array($result, $cp);
-    }
     
     /**
      * メインロジック
@@ -385,11 +342,8 @@ class AsazukeSiteScan
           //   //return true;
           // }
             
-
             $sortAryA = $this->getHref($html);
             // var_dump($sortAryA);
-
-
             $AsazukeSiteScanDB = new AsazukeDB();
 
             foreach ($sortAryA as $k => $v) {
@@ -471,13 +425,11 @@ class AsazukeSiteScan
 
                     AsazukeUtil::logV('', '絶対パスなどを処理');
                     $paths = array_values(array_filter(explode('/', $v)));
-                    // AsazukeUtil::logV("Depth", count($paths));
                 }
                 AsazukeUtil::logV('', 'AsazukeConf::$startDir配下のディレクトリか判定する。');
                 $urlPath = parse_url($v, PHP_URL_PATH);
                 $starDir = AsazukeUtil::ext_dirname(AsazukeConf::$startPath);
                 if(preg_match("/^" . preg_quote($starDir, "/") . "/", $urlPath) == 1){
-                // if (preg_match('/^' . $starDir . "/", $urlPath) == 1) {
                     AsazukeUtil::logV('[Ok]', $urlPath);
                 } else {
                     AsazukeUtil::logV('[Skip]:', $urlPath. " is `". $starDir. "` matches.");
@@ -488,11 +440,6 @@ class AsazukeSiteScan
                 $aryData = array();
                 $key = array();
                 $key['fullPath'] = $v;
-                // if(!isset($paths)){
-                //     $key['depth'] = 1; // 使っていないプロパティなのでとりあえず1
-                // }else{
-                //     $key['depth'] = count($paths);
-                // }
                 
                 $key['checkCount'] = 0;
                 $key['status'] = $response[0];
@@ -512,7 +459,6 @@ class AsazukeSiteScan
         } catch (Exception $e) {
             AsazukeUtil::logE("DOM", print_r($e, true));
         }
-        // exit();
         $unitTestResult['skipLinks'] = $skipLinks;
 
         $AsazukeSiteScanDB = null;
