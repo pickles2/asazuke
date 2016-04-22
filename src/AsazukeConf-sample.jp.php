@@ -17,6 +17,11 @@ class AsazukeConf extends AsazukeConfGeneral
     
     // プロジェクト名 = ディレクトリ名
     public static $projectName = 'sample.jp';
+    
+    // UserAgent
+    public static $userAgent = 'Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.1; Trident/6.0)';
+    // public static $userAgent = 'Mozilla/5.0 (iPhone; CPU iPhone OS 8_0_2 like Mac OS X) AppleWebKit/600.1.4 (KHTML, like Gecko) Version/8.0 Mobile/12A405 Safari/600.1.4';
+    
 
     public static $csv_cols = [
         // '列名' => 'CSSセレクタ',{}内に記述すると、固定値を設定できます。

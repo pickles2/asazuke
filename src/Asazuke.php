@@ -89,16 +89,17 @@ class Asazuke
                 // ソースの取得
                 $url = AsazukeConf::$url . $path;
                 $html = AsazukeUtil::http_file_get_contents($url, $response);
-
+                
                 $aryAsazuke = array();
                 $key = array();
                 $key['filePath'] = $path;
                 $aryAsazuke[] = $key;
-
+                
                 $lastInsertId = $AsazukeDB->insertAsazuke($aryAsazuke);
                 $htmlPath = AsazukeUtil::getDatPath($lastInsertId, AsazukeConf::getHtml());
+                
                 $AsazukeUtilFile = new AsazukeUtilFile($htmlPath, true);
-
+                echo $htmlPath."\n";
                 $AsazukeUtilFile->out($html);
             }
             // ここに実行処理(終了）
