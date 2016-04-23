@@ -60,6 +60,11 @@ CREATE TABLE IF NOT EXISTS t_asazukeSS (
 )
 EOD;
         $this->file_db->exec($sql);
+
+        $sql = <<<EOD
+CREATE INDEX IF NOT EXISTS idx_fullPath ON t_asazukeSS(fullPath)
+EOD;
+        $this->file_db->exec($sql);
     }
 
     public function createXth($i)

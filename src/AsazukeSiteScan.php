@@ -348,7 +348,7 @@ class AsazukeSiteScan
           // }
             
             $sortAryA = $this->getHref($html);
-            // var_dump($sortAryA);
+            $sortAryA = array_values(array_unique($sortAryA));
             $AsazukeSiteScanDB = new AsazukeDB();
 
             foreach ($sortAryA as $k => $v) {
