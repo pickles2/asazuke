@@ -273,9 +273,13 @@ class AsazukeUtil
             $parse["path"] .= ".";
         }
         if (preg_match("/^https?:\/\//", $relationalPath)) {
-            return $relationalPath;
+            $url3 = $relationalPath;
+            //echo '$url3:'.$url3;
+            return $url3;
         } elseif (preg_match("/^\/.*$/", $relationalPath)) {
-            return $parse["scheme"] . "://" . $parse["host"].$port  . $relationalPath;
+            $url2 = $parse["scheme"] . "://" . $parse["host"].$port  . $relationalPath;
+            //echo '$url2'.$url2;
+            return $url2;
         } else {
             $basePath = @explode("/", dirname($parse["path"]));
             $relPath = @explode("/", $relationalPath);
@@ -293,7 +297,9 @@ class AsazukeUtil
                 }
             }
             $path = implode("/", $basePath);
-            return $parse["scheme"] . "://" . $parse["host"] . $port. $path;
+            $url1 = $parse["scheme"] . "://" . $parse["host"] . $port. $path;
+            //echo '$url1'.$url1;
+            return $url1;
         }
     }
 
@@ -461,7 +467,7 @@ EOL;
     private static function asazukeFilefilter($path)
     {
         // 画像
-        if (preg_match('/\.gif$|\.png$|\.jpg$|\.jpeg$|\.bmp$/i', $path)) {
+        if (preg_match('/\.gif$|\.png$|\.jpg$|\.jpeg$|\.bmp|\.ico|\.icns$/i', $path)) {
             // "http"から始まる場合
             return false;
         }

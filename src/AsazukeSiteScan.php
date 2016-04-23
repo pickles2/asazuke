@@ -68,6 +68,11 @@ class AsazukeSiteScan
           }
           
           $this->oneFileExec($path);
+          if(AsazukeConf::$ctrlCd){
+            echo "\033[K" . "Finished -> " . $path . PHP_EOL; // ESC[K カーソル位置から行末までをクリア
+          }else{
+            echo "Finished -> " . $path . PHP_EOL; // ESC[K カーソル位置から行末までをクリア
+          }
         }
         
         while (true) {
@@ -78,7 +83,7 @@ class AsazukeSiteScan
             {
                 $AsazukeSiteScanDB = new AsazukeDB();
                 $AsazukeSiteScanDB->updateChecked($cID); // 開始ID
-                $result = $AsazukeSiteScanDB->select('checkCount=0 and status = \'HTTP/1.1 200 OK\' limit 1');
+                $result = $AsazukeSiteScanDB->select('checkCount=0 limit 1');
 
                 // 進捗表示
                 $progress = $AsazukeSiteScanDB->getSiteScanProgress();
@@ -391,13 +396,22 @@ class AsazukeSiteScan
                         AsazukeUtil::logV('', 'relative URLs(相対パス) "./" or "../" or "(ディレクトリ名|ファイル名)" から始まっている場合');
                         $rootRelativePath = parse_url($_url, PHP_URL_PATH);
                         $rootRelativePath_dir = AsazukeUtil::ext_dirname($rootRelativePath);
-                        $v = parse_url(AsazukeConf::$url .$this->getRootRelativeURLs(AsazukeConf::$url.$rootRelativePath_dir, $v), PHP_URL_PATH);
+                        //echo '$rootRelativePath:'.$rootRelativePath."\n";
+                        //echo '$rootRelativePath_dir:'.$rootRelativePath."\n";
+                        //echo '$v:'.$v."\n";
+                        if($rootRelativePath === '/' && $rootRelativePath_dir === '/'){
+                           // http://getbootstrap.com の <a href="../javascript/"> のような描き方への対応
+                           $v = parse_url(AsazukeConf::$url.$v, PHP_URL_PATH);
+                        }else{
+                           $v = parse_url(AsazukeConf::$url .$this->getRootRelativeURLs(AsazukeConf::$url.$rootRelativePath_dir, $v), PHP_URL_PATH);
+                        }
                     }
 
                     AsazukeUtil::logV('', '解決したルート相対パスを使って有効なURLか調べる。');
                     echo '$v:'.$v."\n";
 
                     AsazukeUtil::http_file_get_contents(AsazukeConf::$url.$v , $response);
+                    //echo $response['reponse_code']."\n";
                     if (preg_match('/2\d{2}/', $response['reponse_code'])
                     || preg_match('/3\d{2}/', $response['reponse_code'])){
                       // 200系 or 300系
@@ -410,7 +424,7 @@ class AsazukeSiteScan
                       }else{
                         $concatURL = $url.$path.$v;
                       }
-                      echo "[3]".$concatURL.PHP_EOL.PHP_EOL;
+                      //echo "[3]".$concatURL.PHP_EOL.PHP_EOL;
 
                       AsazukeUtil::http_file_get_contents($concatURL, $response);
                       if ($response['reponse_code'] !== AsazukeMessage::$CD_2XX) {
@@ -429,6 +443,8 @@ class AsazukeSiteScan
                 AsazukeUtil::logV('', 'AsazukeConf::$startDir配下のディレクトリか判定する。');
                 $urlPath = parse_url($v, PHP_URL_PATH);
                 $starDir = AsazukeUtil::ext_dirname(AsazukeConf::$startPath);
+                //echo $urlPath. "\n";
+                //echo $starDir. "\n";
                 if(preg_match("/^" . preg_quote($starDir, "/") . "/", $urlPath) == 1){
                     AsazukeUtil::logV('[Ok]', $urlPath);
                 } else {
