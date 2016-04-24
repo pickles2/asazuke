@@ -587,11 +587,11 @@ EOL;
         return $head;
     }
 
-    public static function http_file_get_contents($url, &$response)
+    public static function http_file_get_contents($url, &$response, $nobody=true)
     {
         // echo "Digest認証";
         $response2 = $response; // "Strict Standards: Only variables should be passed by reference" 対策。
-        $data = self::curl_file_get_contents($url, $response2);
+        $data = self::curl_file_get_contents($url, $response2, $nobody);
         $response = $response2;
         return $data;
     }
@@ -604,7 +604,7 @@ EOL;
           return filter_var($url, FILTER_VALIDATE_URL) && preg_match('@^https?+://@i', $url);
     }
 
-    public static function curl_file_get_contents($url, &$response, $followlocation=true)
+    public static function curl_file_get_contents($url, &$response, $followlocation=true, $nobody)
     {
       if(!self::is_valid_url($url)){
         return '';
@@ -618,6 +618,7 @@ EOL;
             CURLOPT_URL            => $url, // 取得する URL 。curl_init() でセッションを 初期化する際に指定することも可能です。
             CURLOPT_HEADER         => true, // 	TRUE を設定すると、ヘッダの内容も出力します。
             CURLOPT_VERBOSE        => false, // TRUE を設定すると、詳細な情報を出力します。
+            CURLOPT_NOBODY         => $nobody,
             CURLOPT_RETURNTRANSFER => true, // TRUE を設定すると、curl_exec() の返り値を 文字列で返します。通常はデータを直接出力します。
             CURLOPT_FOLLOWLOCATION => true, // TRUE を設定すると、サーバーが HTTP ヘッダの一部として送ってくる "Location: " ヘッダの内容をたどります
             CURLOPT_MAXREDIRS      =>  10,  // CURLOPT_FOLLOWLOCATIONの辿る最大値、

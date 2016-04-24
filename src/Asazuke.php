@@ -88,7 +88,7 @@ class Asazuke
 
                 // ソースの取得
                 $url = AsazukeConf::$url . $path;
-                $html = AsazukeUtil::http_file_get_contents($url, $response);
+                $html = AsazukeUtil::http_file_get_contents($url, $response, false);
                 
                 $aryAsazuke = array();
                 $key = array();
@@ -315,10 +315,15 @@ class Asazuke
         $p = 0;
 
         foreach ($result as $data) {
-            echo "\r" . $pg[++ $p % count($pg)];
-
             $path = $data['filePath'];
             $id = $data['id'];
+
+            if(AsazukeConf::$ctrlCd){
+              echo "\r" . $pg[++ $p % count($pg)];
+            }else{
+              echo (++$p)."@id[${id}]:".$path."処理中"."\n";
+            }
+
 
             if (! AsazukeUtil::asazukefilter($path)) {
                 // 処理しないリンク
@@ -367,7 +372,7 @@ class Asazuke
                         // ドメインは含まない
                         $aryData[] = parse_url($url, PHP_URL_PATH);
                     }
-                    var_dump('logical_path', $selecter, $aryData);
+                    //var_dump('logical_path', $selecter, $aryData);
 
                     // トップページは含まない
                     $mixed = array_search('/', $aryData);
@@ -408,13 +413,13 @@ class Asazuke
 
                     if (preg_match('#{(.*)?}#', $cssSelector, $matches)) {
                         // $csv_colsに固定値の設定
-                        echo '$csv_colsに固定値の設定:'. $matches[1]." ". $csvKey ."\n";
+                        //echo '$csv_colsに固定値の設定:'. $matches[1]." ". $csvKey ."\n";
                         $csvRowData[$csvKey] = $matches[1];
                     } elseif (strlen($cssSelector) > 0) {
                         // 上記以外のCSSセレクタを処理
 
                         // T-案件用
-                      echo '$csvKey:'.$csvKey."\n";
+                      //echo '$csvKey:'.$csvKey."\n";
                       if($csvKey === '* sitecatalyst1'){
                         // $csvRowData[$csvKey] = pq($doc[$cssSelector])->htmlOuter();
                         $csvRowData[$csvKey] = AsazukeUtil::stripReturn(pq($doc[$cssSelector])->htmlOuter());
@@ -434,7 +439,7 @@ class Asazuke
                         $csvRowData[$csvKey] = pq($doc[$cssSelector])->attr('content');
                       }
                       
-                      echo '上記以外のCSSセレクタを処理:'. $cssSelector .":". pq($doc[$cssSelector])->attr('content')."\n";
+                      //echo '上記以外のCSSセレクタを処理:'. $cssSelector .":". pq($doc[$cssSelector])->attr('content')."\n";
                     }
                 }
                 // var_dump($csvRowData);

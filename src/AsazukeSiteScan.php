@@ -158,7 +158,8 @@ class AsazukeSiteScan
       $_url = $url;
       while($_retryCount >= 0){
         $_retryCount--;
-        $_html = AsazukeUtil::http_file_get_contents($_url, $r0);
+        // htmlの取得しているコード
+        $_html = AsazukeUtil::http_file_get_contents($_url, $r0, false);
         if (preg_match('/2\d{2}/', $r0['reponse_code'])) {
           // レスポンスコード2XX系の場合
           AsazukeUtil::logV(AsazukeMessage::$MSG_STATUS_CD.":".$r0['reponse_code'] , print_r($_url, true));
