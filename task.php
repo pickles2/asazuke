@@ -285,7 +285,6 @@ function scraping()
     // ブラウザで開く
     // $cmd = 'open -b com.google.Chrome http://' . AsazukeConf::$buildInServerIp . ':' . AsazukeConf::$buildInServerPort . '/mst.php';
     // exec($cmd, $arr, $res);
-    echo "Finished!! (scraping)";
 }
 
 function siteValidationCsv()

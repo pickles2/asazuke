@@ -591,7 +591,7 @@ EOL;
     {
         // echo "Digest認証";
         $response2 = $response; // "Strict Standards: Only variables should be passed by reference" 対策。
-        $data = self::curl_file_get_contents($url, $response2, $nobody);
+        $data = self::curl_file_get_contents($url, $response2, null, $nobody);
         $response = $response2;
         return $data;
     }

@@ -504,7 +504,8 @@ class Asazuke
                 }
             }
 
-            $cssWorksFile = AsazukeUtil::getDatPath($id, AsazukeConf::getCss());
+            //$cssWorksFile = AsazukeUtil::getDatPath($id, AsazukeConf::getCss());
+            $cssWorksFile = AsazukeUtil::getDatPath($id, AsazukeConf::getHtml());
 
             // echo $path . "\n";
             // echo $cssWorksFile . "\n";

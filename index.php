@@ -175,11 +175,13 @@ if (count($argv) >= 2) {
         siteValidation();
         //rmCssworks();
         //cssworks();
+        echo "Finished!! (queue_site-validation-ex)";
         return true;
     }
     if ($argv[1] === 'queue_scraping') {
         rmScraping();
         scraping();
+        echo "Finished!! (scraping)";
         return true;
     }
     if ($argv[1] === 'queue_cssworks') {
