@@ -1,4 +1,7 @@
 <?php
+$D = dirname(__FILE__);
+require_once ($D . '/vendor/autoload.php');
+
 use Mshiba\Px2lib\Asazuke;
 use Mshiba\Px2lib\Asazuke\AsazukeConf;
 use Mshiba\Px2lib\Asazuke\AsazukeUtil;
@@ -508,7 +511,21 @@ function show($depth = "")
         AsazukeUtil::createTable($a);
     }
 }
-
+/**
+ * select mac(id) from AsazukeSS; と同じ
+ */
+function countSiteScan()
+{
+    $AsazukeSiteScanDB = new Asazuke\AsazukeDB();
+    $a = $AsazukeSiteScanDB->select('1=1 ORDER BY id ASC');
+    echo end($a)['id'];
+}
+function selectSiteScanById($id)
+{
+    $AsazukeSiteScanDB = new Asazuke\AsazukeDB();
+    $a = $AsazukeSiteScanDB->select('id='.$id);
+    echo (json_encode($a, JSON_UNESCAPED_UNICODE));
+}
 /**
  * CSV出力
  *
