@@ -148,6 +148,16 @@ if (count($argv) >= 2) {
             echo "OSX or Linux" . "\n";
         }
     }
+    if ($argv[1] === 'countSiteScan'){
+        countSiteScan();
+    }
+    // 実行する場合ダブルクォートでくくらないとshellファンクションとして認識される
+    // $ php index.php "selectSiteScanById()"
+    if (preg_match_all('/^selectSiteScanById\(\d.*\)/', $argv[1], $matches)){
+       $fnc = $matches[0][0];
+       //echo $fnc;
+       eval("${fnc};");
+    }
     /**
      * composer scriptsを使って順番に処理していた部分
      * windowsでcomposer scripts経由で実行すると複数プロセスIDが振られてしまう問題があった為
