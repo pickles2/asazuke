@@ -518,7 +518,7 @@ function countSiteScan()
 {
     $AsazukeSiteScanDB = new Asazuke\AsazukeDB();
     $a = $AsazukeSiteScanDB->select('1=1 ORDER BY id ASC');
-    var_dump(end($a)['id']);
+    echo end($a)['id'];
 }
 function selectSiteScanById($id)
 {
