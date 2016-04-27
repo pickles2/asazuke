@@ -53,12 +53,16 @@ class AsazukeDB
 CREATE TABLE IF NOT EXISTS t_asazukeSS (
     id INTEGER PRIMARY KEY,
     fullPath TEXT UNIQUE,
-    depth INTEGER,
     checkCount INTEGER,
     status TEXT,
     statusCode INTEGER,
     time default CURRENT_TIMESTAMP
 )
+EOD;
+        $this->file_db->exec($sql);
+
+        $sql = <<<EOD
+CREATE INDEX IF NOT EXISTS idx_fullPath ON t_asazukeSS(fullPath)
 EOD;
         $this->file_db->exec($sql);
     }
@@ -117,7 +121,7 @@ EOD;
     {
         $sql = <<<EOD
 SELECT T1.count || " / " || T2.count AS PROGRESS FROM
-(SELECT count(id) AS count FROM t_asazukeSS WHERE checkCount=1) AS T1 LEFT JOIN
+(SELECT count(id) AS count FROM t_asazukeSS WHERE checkCount>0) AS T1 LEFT JOIN
 (SELECT count(id) AS count FROM t_asazukeSS) AS T2
 EOD;
         $stmt = $this->file_db->query($sql);
@@ -212,7 +216,6 @@ EOD;
     public function insert($aryData)
     {
         try {
-          // var_dump($aryData[0]);
           $fullPath = $aryData[0]['fullPath'];
           $result = $this->select('fullPath=\''+ $fullPath+ '\' limit 1');
           if ($result || count($result) > 0) {
@@ -224,13 +227,11 @@ EOD;
             $sql = <<<EOD
 INSERT INTO t_asazukeSS (
     fullPath,
-    depth,
     checkCount,
     status,
     statusCode
 ) VALUES (
     :fullPath,
-    :depth,
     :checkCount,
     :status,
     :statusCode
@@ -241,7 +242,7 @@ EOD;
 
             // Bind parameters to statement variables
             $stmt->bindParam(':fullPath', $fullPath);
-            $stmt->bindParam(':depth', $depth);
+            // $stmt->bindParam(':depth', $depth);
             $stmt->bindParam(':checkCount', $checkCount);
             $stmt->bindParam(':status', $status);
             $stmt->bindParam(':statusCode', $statusCode);
@@ -250,7 +251,7 @@ EOD;
             foreach ($aryData as $key) {
                 // Set values to bound variables
                 $fullPath = $key['fullPath'];
-                $depth = $key['depth'];
+                // $depth = $key['depth'];
                 $checkCount = $key['checkCount'];
                 $status = $key['status'];
                 $statusCode = $key['statusCode'];
@@ -260,12 +261,17 @@ EOD;
 
                 // last insert id
                 $lastInsertId = $this->file_db->lastInsertId();
-                return $lastInsertId;
+                return $lastInsertId; // 正常系
             }
         } catch (\PDOException $e) {
-            var_dump($e);
+          if($e->getCode() == 23000){
+            echo "既に登録済みのPATHです。: " . $fullPath. "\n";
+          }else{
+            echo "Statement failed: " . $e->getMessage(). "\n";
+          }
+            return 0; // 異常系
         }
-        return 0;
+        return 0; // 異常系
     }
 
     /**
@@ -337,16 +343,7 @@ EOD;
         $sql = <<<EOD
 CREATE TABLE IF NOT EXISTS t_asazuke (
     id INTEGER PRIMARY KEY,
-    filePath TEXT,
-    message TEXT,
-    meta TEXT,
-    title TEXT,
-    h1 TEXT,
-    h2 TEXT,
-    h3 TEXT,
-    breadCrumb TEXT,
-    errorCount INTEGER,
-    warningCount INTEGER,
+    filePath TEXT
     time default CURRENT_TIMESTAMP
 )
 EOD;
@@ -405,27 +402,9 @@ EOD;
     {
         $sql = <<<EOD
 INSERT INTO t_asazuke (
-    filePath,
-    message,
-    meta,
-    title,
-    h1,
-    h2,
-    h3,
-    breadCrumb,
-    errorCount,
-    warningCount
+    filePath
 ) VALUES (
-    :filePath,
-    :message,
-    :meta,
-    :title,
-    :h1,
-    :h2,
-    :h3,
-    :breadCrumb,
-    :errorCount,
-    :warningCount
+    :filePath
 )
 EOD;
 
@@ -433,32 +412,37 @@ EOD;
 
         // Bind parameters to statement variables
         $stmt->bindParam(':filePath', $filePath);
-        $stmt->bindParam(':message', $message);
-        $stmt->bindParam(':title', $title);
-        $stmt->bindParam(':h1', $h1);
-        $stmt->bindParam(':h2', $h2);
-        $stmt->bindParam(':h3', $h3);
-        $stmt->bindParam(':breadCrumb', $breadCrumb);
-        $stmt->bindParam(':meta', $meta);
-        $stmt->bindParam(':errorCount', $errorCount);
-        $stmt->bindParam(':warningCount', $warningCount);
+        // $stmt->bindParam(':message', $message);
+        // $stmt->bindParam(':title', $title);
+        // $stmt->bindParam(':h1', $h1);
+        // $stmt->bindParam(':h2', $h2);
+        // $stmt->bindParam(':h3', $h3);
+        // $stmt->bindParam(':breadCrumb', $breadCrumb);
+        // $stmt->bindParam(':meta', $meta);
+        // $stmt->bindParam(':errorCount', $errorCount);
+        // $stmt->bindParam(':warningCount', $warningCount);
 
         // Loop thru all messages and execute prepared insert statement
         foreach ($aryData as $key) {
             // Set values to bound variables
             $filePath = $key['filePath'];
-            $message = $key['message'];
-            $title = $key['title'];
-            $h1 = $key['h1'];
-            $h2 = $key['h2'];
-            $h3 = $key['h3'];
-            $breadCrumb = $key['breadCrumb'];
-            $meta = $key['meta'];
-            $errorCount = $key['errorCount'];
-            $warningCount = $key['warningCount'];
+            // $message = $key['message'];
+            // $title = $key['title'];
+            // $h1 = $key['h1'];
+            // $h2 = $key['h2'];
+            // $h3 = $key['h3'];
+            // $breadCrumb = $key['breadCrumb'];
+            // $meta = $key['meta'];
+            // $errorCount = $key['errorCount'];
+            // $warningCount = $key['warningCount'];
 
             // Execute statement
+        try{
             $stmt->execute();
+        } catch (\PDOException $e) {
+            // Print PDOException message
+            echo $e->getMessage();
+        }
 
             // last insert id
             $lastInsertId = $this->file_db->lastInsertId();

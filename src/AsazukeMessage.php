@@ -26,6 +26,16 @@ class AsazukeMessage
 
     public static $MSG_STATUS_CD = 'HTTPステータスコード';
 
+    public static function error_tidy(){ 
+      echo <<< EOF
+  tidy_parse_string()が使えません。
+      
+  ※下記のコマンドを実行してインストールして下さい。
+  $ brew install tidy-html5
+  $ brew install php5?-tidy
 
+
+EOF;
+    }
 }
 ?>

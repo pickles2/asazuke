@@ -29,7 +29,32 @@ class AsazukeUtil
         $fileLog = new AsazukeUtilFile(AsazukeConf::getLogPath());
         $fileLog->out("[Error] $tag " . self::stripReturn($text));
     }
-
+    
+    /**
+     * なんでもUTF-8に変換
+     */
+    public static function convertUtf8($text){
+      //$nkfpath = '/usr/local/bin/nkf';
+      ////$text = preg_replace('/(?:\n|\r|\r\n)/','',$text);
+      //$text = '"'.mb_ereg_replace("\"", '\"', $text).'"';
+      //$command = popen("echo $text | $nkfpath -w -Lu ","r");
+      //$result = "";
+      //while (!feof($command)) {
+      //    $result .= fgets($command);
+      //}
+      //pclose($command);
+      //return $result;
+    
+      $result = "";
+      $cp = "";
+      if($text){
+        mb_language("Japanese");
+        $cp = mb_detect_encoding($text, "ASCII,JIS,UTF-8,CP51932,SJIS-win", true);
+        echo $cp;
+        $result = mb_convert_encoding($text, "UTF-8", $cp);
+      }
+      return array($result, $cp);
+    }
     /**
      * "1st, 2nd, 3rd, 4th..."を返す
      *
@@ -248,9 +273,13 @@ class AsazukeUtil
             $parse["path"] .= ".";
         }
         if (preg_match("/^https?:\/\//", $relationalPath)) {
-            return $relationalPath;
+            $url3 = $relationalPath;
+            //echo '$url3:'.$url3;
+            return $url3;
         } elseif (preg_match("/^\/.*$/", $relationalPath)) {
-            return $parse["scheme"] . "://" . $parse["host"].$port  . $relationalPath;
+            $url2 = $parse["scheme"] . "://" . $parse["host"].$port  . $relationalPath;
+            //echo '$url2'.$url2;
+            return $url2;
         } else {
             $basePath = @explode("/", dirname($parse["path"]));
             $relPath = @explode("/", $relationalPath);
@@ -268,7 +297,9 @@ class AsazukeUtil
                 }
             }
             $path = implode("/", $basePath);
-            return $parse["scheme"] . "://" . $parse["host"] . $port. $path;
+            $url1 = $parse["scheme"] . "://" . $parse["host"] . $port. $path;
+            //echo '$url1'.$url1;
+            return $url1;
         }
     }
 
@@ -436,7 +467,7 @@ EOL;
     private static function asazukeFilefilter($path)
     {
         // 画像
-        if (preg_match('/\.gif$|\.png$|\.jpg$|\.jpeg$|\.bmp$/i', $path)) {
+        if (preg_match('/\.gif$|\.png$|\.jpg$|\.jpeg$|\.bmp|\.ico|\.icns$/i', $path)) {
             // "http"から始まる場合
             return false;
         }
@@ -556,26 +587,38 @@ EOL;
         return $head;
     }
 
-    public static function http_file_get_contents($url, &$response)
+    public static function http_file_get_contents($url, &$response, $nobody=true)
     {
         // echo "Digest認証";
         $response2 = $response; // "Strict Standards: Only variables should be passed by reference" 対策。
-        $data = self::curl_file_get_contents($url, $response2);
+        $data = self::curl_file_get_contents($url, $response2, null, $nobody);
         $response = $response2;
         return $data;
     }
 
-    public static function curl_file_get_contents($url, &$response, $followlocation=true)
+    /**
+     * URLチェック
+     */
+    public static function is_valid_url($url) {
+          // こんな便利関数があったのか
+          return filter_var($url, FILTER_VALIDATE_URL) && preg_match('@^https?+://@i', $url);
+    }
+
+    public static function curl_file_get_contents($url, &$response, $followlocation=true, $nobody)
     {
+      if(!self::is_valid_url($url)){
+        return '';
+      }
+      
       error_reporting(E_ALL);
       ini_set( 'display_errors','1');
       // echo $url.PHP_EOL;
-
     //   $post_data = array();
       $options = array(
             CURLOPT_URL            => $url, // 取得する URL 。curl_init() でセッションを 初期化する際に指定することも可能です。
             CURLOPT_HEADER         => true, // 	TRUE を設定すると、ヘッダの内容も出力します。
             CURLOPT_VERBOSE        => false, // TRUE を設定すると、詳細な情報を出力します。
+            CURLOPT_NOBODY         => $nobody,
             CURLOPT_RETURNTRANSFER => true, // TRUE を設定すると、curl_exec() の返り値を 文字列で返します。通常はデータを直接出力します。
             CURLOPT_FOLLOWLOCATION => true, // TRUE を設定すると、サーバーが HTTP ヘッダの一部として送ってくる "Location: " ヘッダの内容をたどります
             CURLOPT_MAXREDIRS      =>  10,  // CURLOPT_FOLLOWLOCATIONの辿る最大値、
@@ -588,7 +631,6 @@ EOL;
             //   CURLOPT_POST           => true, // TRUE を設定すると、HTTP POST を行います。POST は、application/x-www-form-urlencoded 形式で 行われます。これは一般的な HTML のフォームと同じ形式です。
             //   CURLOPT_POSTFIELDS     => http_build_query($post_data) // TRUE にすると、CURLOPT_POSTFIELDS でのファイルアップロードの際の @ プレフィックスを無効にします。 つまり、@ で始まる値を安全に渡せるようになるということです。 アップロードには CURLFile が使われるでしょう。
       );
-
       $ch = curl_init();
       curl_setopt_array( $ch, $options);
 
@@ -604,9 +646,9 @@ EOL;
         if ($status_code != 200)
           // 200以外は出力
           self::logW('', '$status_code:'. $status_code. ' $url:'.$url);
-      } catch(Exception $ex) {
+      } catch(\Exception $ex) {
           if ($ch != null) curl_close($ch);
-          throw new \Exception($ex);
+          echo 'Skip -> '. $url . '    message:'. $ex->getMessage();
       }
 
       $header_size = curl_getinfo($ch, CURLINFO_HEADER_SIZE);

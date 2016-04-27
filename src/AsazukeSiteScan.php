@@ -4,12 +4,11 @@
  */
 namespace Mshiba\Px2lib\Asazuke;
 
-$D = dirname(__FILE__);
-require_once ($D . '/libs/phpQuery-onefile.php');
+//$D = dirname(__FILE__);
+//require_once ($D . '/libs/phpQuery-onefile.php');
 
 class AsazukeSiteScan
 {
-
     private $console;
 
     /**
@@ -35,16 +34,53 @@ class AsazukeSiteScan
     {
         $cID = 1;
         $path = AsazukeConf::$startPath;
-        // echo $path.PHP_EOL;
-        $this->oneFileExec($path);
+        echo $path.PHP_EOL;
+        
+
+        $AsazukeSiteScanDB = new AsazukeDB();
+        $aryData = array();
+        $key = array();
+        
+        $mst = AsazukeConf::$url;
+        $_url = AsazukeUtil::getResolvePath($path, $mst, $path);
+        $data = AsazukeUtil::http_file_get_contents($_url, $response);
+        var_dump($response);
+        var_dump($response['reponse_code']);
+        if ($response['reponse_code'] !== 200) {
+
+        //extract($this->checkStatusCode($_url), EXTR_OVERWRITE);
+          AsazukeUtil::logV('', '2XX以外は処理を中断する。');
+          echo "開始URL:".$_url."が不正です。"."\n";
+          return $statusCode;
+        }else{
+          $key['fullPath'] = AsazukeConf::$startPath;
+          $key['checkCount'] = 0;
+          $key['status'] = $response[0]; //"HTTP/1.1 200 OK"になるはず
+          $key['statusCode'] = $response['reponse_code'];
+          $aryData[] = $key;
+
+          $lastInsertId = $AsazukeSiteScanDB->insert($aryData);
+
+          if($lastInsertId > 0){
+            // insertに成功したデータ
+            $aryData[0]['id'] = $lastInsertId;
+            echo "Result -> ".json_encode($aryData[0], JSON_UNESCAPED_UNICODE).PHP_EOL;
+          }
+          
+          $this->oneFileExec($path);
+          if(AsazukeConf::$ctrlCd){
+            echo "\033[K" . "Finished -> " . $path . PHP_EOL; // ESC[K カーソル位置から行末までをクリア
+          }else{
+            echo "Finished -> " . $path . PHP_EOL; // ESC[K カーソル位置から行末までをクリア
+          }
+        }
+        
         while (true) {
 
             $time_start = microtime(true) * 1000;
 
             // ここに実行処理(開始）
             {
-
-
                 $AsazukeSiteScanDB = new AsazukeDB();
                 $AsazukeSiteScanDB->updateChecked($cID); // 開始ID
                 $result = $AsazukeSiteScanDB->select('checkCount=0 limit 1');
@@ -52,11 +88,10 @@ class AsazukeSiteScan
                 // 進捗表示
                 $progress = $AsazukeSiteScanDB->getSiteScanProgress();
                 $this->console->out (PHP_EOL. $progress);
-
+                
                 if (! $result || count($result) == 0) {
                     break;
                 } else {
-                  // echo "NEXT", print_r($result, true);
                     AsazukeUtil::logV("NEXT", print_r($result, true));
                     $path = $result[0]['fullPath'];
                     $this->oneFileExec($path); // ここで実行
@@ -123,7 +158,8 @@ class AsazukeSiteScan
       $_url = $url;
       while($_retryCount >= 0){
         $_retryCount--;
-        $_html = AsazukeUtil::http_file_get_contents($_url, $r0);
+        // htmlの取得しているコード
+        $_html = AsazukeUtil::http_file_get_contents($_url, $r0, false);
         if (preg_match('/2\d{2}/', $r0['reponse_code'])) {
           // レスポンスコード2XX系の場合
           AsazukeUtil::logV(AsazukeMessage::$MSG_STATUS_CD.":".$r0['reponse_code'] , print_r($_url, true));
@@ -168,7 +204,10 @@ class AsazukeSiteScan
      */
     public function getHref($html){
       // 2 phpQueryのドキュメントオブジェクトを生成
-      $doc = \phpQuery::newDocument($html);
+      
+      // $doc = \phpQuery::newDocument($html);
+      $doc = \phpQuery::newDocumentHTML($html);
+      
       $aryA = array();
       // foreach ($doc["a"] as $a) {
       //     $link = pq($a)->attr('href');
@@ -202,6 +241,7 @@ class AsazukeSiteScan
           }
         }
       }
+      
       $filterAryA = array_filter($aryA, "strlen"); // 空配列を削除
       $sortAryA = array_unique($filterAryA, SORT_STRING); // 重複削除
       asort($sortAryA, SORT_STRING); // ソート
@@ -252,7 +292,7 @@ class AsazukeSiteScan
       AsazukeUtil::logV("pathClean", $v_org . ' -> ' . $v);
       return $v;
     }
-
+    
     /**
      * メインロジック
      */
@@ -295,8 +335,21 @@ class AsazukeSiteScan
         AsazukeUtil::logV("URL(on Database)", $_url);
         echo ("URL(on Database)" .$_url.PHP_EOL);
         try {
+          // \phpQuery::newDocument($html); でfatal errorがでる場合があるので事前チェックを実施
+          echo 'loadHTML:::.'."\n";
+          // 文字コード変換(utf8化)
+          // $ary = $this->text2utf8($html);
+          // $html = $ary[0];
+          // $cp =  $ary[1];
+          
+          // $bool = \DOMDocument::loadHTML($html);
+          // if(!$bool){
+          //   echo "Skip -> ".$url. ' message:htmlとして処理出来ませんでした。';
+          //   //return true;
+          // }
+            
             $sortAryA = $this->getHref($html);
-
+            $sortAryA = array_values(array_unique($sortAryA));
             $AsazukeSiteScanDB = new AsazukeDB();
 
             foreach ($sortAryA as $k => $v) {
@@ -320,7 +373,9 @@ class AsazukeSiteScan
                     }
                     if (preg_match('/^\/\//', $v)) {
                         // network-path reference(ネットワークパス参照) "//"から始まる場合
-                        $newURL = 'http:' . $v;
+                        $scheme = parse_url(AsazukeConf::$url, PHP_URL_SCHEME);
+                        //$newURL = 'http:' . $v;
+                        $newURL = $scheme. ':' . $v;
                         AsazukeUtil::http_file_get_contents($newURL, $r1);
                         if ($r1['reponse_code'] !== AsazukeMessage::$CD_2XX) {
                             // 2XX以外の場合
@@ -344,13 +399,22 @@ class AsazukeSiteScan
                         AsazukeUtil::logV('', 'relative URLs(相対パス) "./" or "../" or "(ディレクトリ名|ファイル名)" から始まっている場合');
                         $rootRelativePath = parse_url($_url, PHP_URL_PATH);
                         $rootRelativePath_dir = AsazukeUtil::ext_dirname($rootRelativePath);
-                        $v = parse_url(AsazukeConf::$url .$this->getRootRelativeURLs(AsazukeConf::$url.$rootRelativePath_dir, $v), PHP_URL_PATH);
+                        //echo '$rootRelativePath:'.$rootRelativePath."\n";
+                        //echo '$rootRelativePath_dir:'.$rootRelativePath."\n";
+                        //echo '$v:'.$v."\n";
+                        if($rootRelativePath === '/' && $rootRelativePath_dir === '/'){
+                           // http://getbootstrap.com の <a href="../javascript/"> のような描き方への対応
+                           $v = parse_url(AsazukeConf::$url.$v, PHP_URL_PATH);
+                        }else{
+                           $v = parse_url(AsazukeConf::$url .$this->getRootRelativeURLs(AsazukeConf::$url.$rootRelativePath_dir, $v), PHP_URL_PATH);
+                        }
                     }
 
                     AsazukeUtil::logV('', '解決したルート相対パスを使って有効なURLか調べる。');
                     echo '$v:'.$v."\n";
 
                     AsazukeUtil::http_file_get_contents(AsazukeConf::$url.$v , $response);
+                    //echo $response['reponse_code']."\n";
                     if (preg_match('/2\d{2}/', $response['reponse_code'])
                     || preg_match('/3\d{2}/', $response['reponse_code'])){
                       // 200系 or 300系
@@ -363,7 +427,7 @@ class AsazukeSiteScan
                       }else{
                         $concatURL = $url.$path.$v;
                       }
-                      echo "[3]".$concatURL.PHP_EOL.PHP_EOL;
+                      //echo "[3]".$concatURL.PHP_EOL.PHP_EOL;
 
                       AsazukeUtil::http_file_get_contents($concatURL, $response);
                       if ($response['reponse_code'] !== AsazukeMessage::$CD_2XX) {
@@ -378,13 +442,13 @@ class AsazukeSiteScan
 
                     AsazukeUtil::logV('', '絶対パスなどを処理');
                     $paths = array_values(array_filter(explode('/', $v)));
-                    AsazukeUtil::logV("Depth", count($paths));
                 }
                 AsazukeUtil::logV('', 'AsazukeConf::$startDir配下のディレクトリか判定する。');
                 $urlPath = parse_url($v, PHP_URL_PATH);
                 $starDir = AsazukeUtil::ext_dirname(AsazukeConf::$startPath);
+                //echo $urlPath. "\n";
+                //echo $starDir. "\n";
                 if(preg_match("/^" . preg_quote($starDir, "/") . "/", $urlPath) == 1){
-                // if (preg_match('/^' . $starDir . "/", $urlPath) == 1) {
                     AsazukeUtil::logV('[Ok]', $urlPath);
                 } else {
                     AsazukeUtil::logV('[Skip]:', $urlPath. " is `". $starDir. "` matches.");
@@ -395,11 +459,6 @@ class AsazukeSiteScan
                 $aryData = array();
                 $key = array();
                 $key['fullPath'] = $v;
-                if(!isset($paths)){
-                    $key['depth'] = 1; // 使っていないプロパティなのでとりあえず1
-                }else{
-                    $key['depth'] = count($paths);
-                }
                 
                 $key['checkCount'] = 0;
                 $key['status'] = $response[0];
@@ -419,7 +478,6 @@ class AsazukeSiteScan
         } catch (Exception $e) {
             AsazukeUtil::logE("DOM", print_r($e, true));
         }
-        // exit();
         $unitTestResult['skipLinks'] = $skipLinks;
 
         $AsazukeSiteScanDB = null;
