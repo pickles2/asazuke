@@ -373,7 +373,9 @@ class AsazukeSiteScan
                     }
                     if (preg_match('/^\/\//', $v)) {
                         // network-path reference(ネットワークパス参照) "//"から始まる場合
-                        $newURL = 'http:' . $v;
+                        $scheme = parse_url(AsazukeConf::$url, PHP_URL_SCHEME);
+                        //$newURL = 'http:' . $v;
+                        $newURL = $scheme. ':' . $v;
                         AsazukeUtil::http_file_get_contents($newURL, $r1);
                         if ($r1['reponse_code'] !== AsazukeMessage::$CD_2XX) {
                             // 2XX以外の場合
