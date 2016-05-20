@@ -89,7 +89,13 @@ class Asazuke
                 // ソースの取得
                 $url = AsazukeConf::$url . $path;
                 $html = AsazukeUtil::http_file_get_contents($url, $response, false);
-                
+
+                //$html = mb_convert_encoding($html, 'utf8', 'sjis-win');
+                mb_language("Japanese");
+                $cp = mb_detect_encoding($html, "ASCII,JIS,UTF-8,CP51932,SJIS-win", true);
+                echo $cp;
+                $html = mb_convert_encoding($html, "UTF-8", $cp); 
+
                 $aryAsazuke = array();
                 $key = array();
                 $key['filePath'] = $path;
