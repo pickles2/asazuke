@@ -424,26 +424,35 @@ class Asazuke
                     } elseif (strlen($cssSelector) > 0) {
                         // 上記以外のCSSセレクタを処理
 
-                        // T-案件用
-                      //echo '$csvKey:'.$csvKey."\n";
-                      if($csvKey === '* sitecatalyst1'){
-                        // $csvRowData[$csvKey] = pq($doc[$cssSelector])->htmlOuter();
-                        $csvRowData[$csvKey] = AsazukeUtil::stripReturn(pq($doc[$cssSelector])->htmlOuter());
-                      }else if($csvKey === '* sitecatalyst2'){
-                        $scripts = array();
-                        foreach($doc[$cssSelector] AS $obj){
-                          $scriptTag = pq($obj)->htmlOuter();
-                          array_push($scripts, $scriptTag);
+                        // A用
+                        if($csvKey === '* sitecatalyst'){
+                            // $csvRowData[$csvKey] = pq($doc[$cssSelector])->htmlOuter();
+                            $csvRowData[$csvKey] = AsazukeUtil::stripReturn(pq($doc[$cssSelector])->htmlOuter());
+                        }else if($csvKey === '* apple-touch-icon'){
+                            // $csvRowData[$csvKey] = pq($doc[$cssSelector])->htmlOuter();
+                            $csvRowData[$csvKey] = pq($doc[$cssSelector])->attr('href');
                         }
-                        // var_dump($scripts);
-                        // die();
-                        // $csvRowData[$csvKey] = implode(',',preg_grep("/(SCoutput_bc)/s", $scripts));
-                        $csvRowData[$csvKey] = AsazukeUtil::stripReturn(implode(',',preg_grep("/(SCoutput_bc)/s", $scripts)));
-
-                      }else{
-                        $selecter = AsazukeConf::$csv_cols['* description'];
-                        $csvRowData[$csvKey] = pq($doc[$cssSelector])->attr('content');
-                      }
+                        
+                        // T用
+                        //echo '$csvKey:'.$csvKey."\n";
+                        //   if($csvKey === '* sitecatalyst1'){
+                        //     // $csvRowData[$csvKey] = pq($doc[$cssSelector])->htmlOuter();
+                        //     $csvRowData[$csvKey] = AsazukeUtil::stripReturn(pq($doc[$cssSelector])->htmlOuter());
+                        //   }else if($csvKey === '* sitecatalyst2'){
+                        //     $scripts = array();
+                        //     foreach($doc[$cssSelector] AS $obj){
+                        //       $scriptTag = pq($obj)->htmlOuter();
+                        //       array_push($scripts, $scriptTag);
+                        //     }
+                        //     // var_dump($scripts);
+                        //     // die();
+                        //     // $csvRowData[$csvKey] = implode(',',preg_grep("/(SCoutput_bc)/s", $scripts));
+                        //     $csvRowData[$csvKey] = AsazukeUtil::stripReturn(implode(',',preg_grep("/(SCoutput_bc)/s", $scripts)));
+                        //   }
+                        
+                        else{
+                            $csvRowData[$csvKey] = pq($doc[$cssSelector])->attr('content');
+                        }
                       
                       //echo '上記以外のCSSセレクタを処理:'. $cssSelector .":". pq($doc[$cssSelector])->attr('content')."\n";
                     }
