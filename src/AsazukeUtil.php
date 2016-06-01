@@ -198,6 +198,15 @@ class AsazukeUtil
         } elseif (preg_match('/^mailto\:/i', $path)) {
             if($dev) echo 'mailtoで始まるURL'.PHP_EOL;
             return $path;
+        } elseif (preg_match('/^tel\:/i', $path)) {
+            if($dev) echo 'telで始まるURL'.PHP_EOL;
+            return $path;
+        } elseif (preg_match('/^tel-av\:/i', $path)) {
+            if($dev) echo 'tel-avで始まるURL'.PHP_EOL;
+            return $path;
+        } elseif (preg_match('/^pos\:/i', $path)) {
+            if($dev) echo 'posで始まるURL'.PHP_EOL;
+            return $path;
         } elseif (preg_match('/^#/', $path)) {
             if($dev) echo '"#"から始まる場合'.PHP_EOL;
             return $path;
