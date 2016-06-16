@@ -445,7 +445,7 @@ class AsazukeSiteScan
                 }
                 AsazukeUtil::logV('', 'AsazukeConf::$startDir配下のディレクトリか判定する。');
                 $urlPath = parse_url($v, PHP_URL_PATH);
-                $starDir = AsazukeUtil::ext_dirname(AsazukeConf::$startPath);
+                $starDir = $this->pathClean(AsazukeUtil::ext_dirname(AsazukeConf::$startPath));
                 //echo $urlPath. "\n";
                 //echo $starDir. "\n";
                 if(preg_match("/^" . preg_quote($starDir, "/") . "/", $urlPath) == 1){
