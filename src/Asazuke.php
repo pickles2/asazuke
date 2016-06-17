@@ -342,6 +342,15 @@ class Asazuke
             // echo $cssWorksFile . "\n";
             {
                 $html = file_get_contents($cssWorksFile);
+                
+                // "<meta http-equiv="を削除
+                {
+                    $ptn='/<meta[^>]http-equiv\s?=\s?[\"\']([^\"\']+)[\"\'][^>]*>/i';
+                    preg_match_all($ptn, $html, $m);
+                    var_dump($m[0][0]);
+                    $html = str_replace($m[0][0], '', $html);
+                }
+                
                 //$tidy = tidy_parse_string($html, array(), AsazukeConf::$tidyEncoding);
                 //$tidy->cleanRepair();
 
