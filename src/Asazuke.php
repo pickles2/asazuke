@@ -345,10 +345,12 @@ class Asazuke
                 
                 // "<meta http-equiv="を削除
                 {
-                    $ptn='/<meta[^>]http-equiv\s?=\s?[\"\']([^\"\']+)[\"\'][^>]*>/i';
+                    // \g シーケンスで負の数値を使うと、 それは相対参照
+                    // \g{-2}は相対指定で2つ前の'([\"\'])'と一致したものを使う
+                    $ptn='/<meta(.*?)[^>]http-equiv\s*=\s*([\"\'])(.*?)\g{-2}[^>]*>/i';
                     preg_match_all($ptn, $html, $m);
-                    var_dump($m[0][0]);
-                    $html = str_replace($m[0][0], '', $html);
+                    // 複数の <meta http-equiv="?"> を空文字に置換
+                    $html = str_replace($m[0], '', $html);
                 }
                 
                 //$tidy = tidy_parse_string($html, array(), AsazukeConf::$tidyEncoding);
