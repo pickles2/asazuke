@@ -376,7 +376,7 @@ class Asazuke
                 {
                     // title_breadcrumb
                     $selecter = AsazukeConf::$csv_cols['* title_breadcrumb'];
-                    $csvRowData['* title_breadcrumb'] = pq($doc[$selecter])->text();
+                    $csvRowData['* title_breadcrumb'] = AsazukeUtil::stripReturn(pq($doc[$selecter])->text());
                 }
                 {
                     // logical_path
@@ -406,6 +406,8 @@ class Asazuke
                     // meta keywords
                     $selecter = AsazukeConf::$csv_cols['* keywords'];
                     $csvRowData['* keywords'] = pq($doc[$selecter])->attr('content');
+                    $selecter = AsazukeConf::$csv_cols['* keyword'];
+                    $csvRowData['* keyword'] = pq($doc[$selecter])->attr('content');
                 }
                 {
                     // meta description
@@ -440,8 +442,20 @@ class Asazuke
                         }else if($csvKey === '* apple-touch-icon'){
                             // $csvRowData[$csvKey] = pq($doc[$cssSelector])->htmlOuter();
                             $csvRowData[$csvKey] = pq($doc[$cssSelector])->attr('href');
-                        }
-                        
+                        }else if($csvKey === '* canonical'){
+                            // link canonical
+                            $selecter = AsazukeConf::$csv_cols['* canonical'];
+                            $csvRowData['* canonical'] = pq($doc[$selecter])->attr('href');
+                        }else if($csvKey === '* icon'){
+                            // link icon
+                            $selecter = AsazukeConf::$csv_cols['* icon'];
+                            $csvRowData['* icon'] = pq($doc[$selecter])->attr('href');
+                        }else if($csvKey === '* shortcut-icon'){
+                             // link icon
+                            $selecter = AsazukeConf::$csv_cols['* shortcut-icon'];
+                            $csvRowData['* shortcut-icon'] = pq($doc[$selecter])->attr('href');
+
+                        // }
                         // T用
                         //echo '$csvKey:'.$csvKey."\n";
                         //   if($csvKey === '* sitecatalyst1'){
@@ -458,12 +472,32 @@ class Asazuke
                         //     // $csvRowData[$csvKey] = implode(',',preg_grep("/(SCoutput_bc)/s", $scripts));
                         //     $csvRowData[$csvKey] = AsazukeUtil::stripReturn(implode(',',preg_grep("/(SCoutput_bc)/s", $scripts)));
                         //   }
-                        
-                        else{
-                            $csvRowData[$csvKey] = pq($doc[$cssSelector])->attr('content');
+
+                        // Toyota Ph2
+                        }else if(preg_match('/^\*\s+has-/', $csvKey)){
+                            // 存在チェック
+                            $selecter = AsazukeConf::$csv_cols[$csvKey];
+                            $outerHtml =  AsazukeUtil::stripReturn(pq($doc[$selecter])->htmlOuter());
+                            if(strlen($outerHtml) > 0){
+                                $csvRowData[$csvKey] = '+';
+                            }
+                        }else if(preg_match('/-link$/', $csvKey)){
+                            // -link で終わるもの
+                            // * .breadcrumbCD_1-link
+                            // * .migration-breadcrumbs_1-link
+                            $selecter = AsazukeConf::$csv_cols[$csvKey];
+                            $csvRowData[$csvKey] = pq($doc[$selecter])->attr('href');
+                        }else if(preg_match('/-text$/', $csvKey)){
+                            // -text で終わるもの
+                            // * .breadcrumbCD_1-text
+                            // * .migration-breadcrumbs_1-text
+                            $selecter = AsazukeConf::$csv_cols[$csvKey];
+                            $csvRowData[$csvKey] = pq($doc[$selecter])->text();
+                        }else{
+                            // meta content etc...
+                            $selecter = AsazukeConf::$csv_cols[$csvKey];
+                            $csvRowData[$csvKey] = pq($doc[$selecter])->attr('content');
                         }
-                      
-                      //echo '上記以外のCSSセレクタを処理:'. $cssSelector .":". pq($doc[$cssSelector])->attr('content')."\n";
                     }
                 }
                 // var_dump($csvRowData);
