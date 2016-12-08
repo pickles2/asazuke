@@ -635,13 +635,10 @@ EOL;
             CURLOPT_RETURNTRANSFER => true, // TRUE を設定すると、curl_exec() の返り値を 文字列で返します。通常はデータを直接出力します。
             CURLOPT_FOLLOWLOCATION => true, // TRUE を設定すると、サーバーが HTTP ヘッダの一部として送ってくる "Location: " ヘッダの内容をたどります
             CURLOPT_MAXREDIRS      =>  10,  // CURLOPT_FOLLOWLOCATIONの辿る最大値、
+            
             CURLOPT_SSL_VERIFYPEER => false,    // for https
-            // for T案件 カスタムUAを使うと認証エラーになる。
-            // CURLOPT_USERAGENT      => AsazukeConf::$userAgent, // UserAgent
-            // CURLOPT_USERPWD        => AsazukeConf::$authUser . ":" . AsazukeConf::$authPass, // 接続に使用するユーザー名とパスワード。 "[username]:[password]" 形式で指定します。
-            // CURLOPT_HTTPAUTH       => CURLAUTH_ANY, // 使用する HTTP 認証方法。以下の中から選びます。 CURLAUTH_BASIC、 CURLAUTH_DIGEST、 CURLAUTH_GSSNEGOTIATE、 CURLAUTH_NTLM、 CURLAUTH_ANY および CURLAUTH_ANYSAFE。
               
-            # コレを設定するとgithub.ioでは405になるサーバーがあるので注意 →テストが通らなくなります。
+            # コレを設定するとgithub.ioでは405になるサーバーがあるので注意 → テストが通らなくなります。
             //   CURLOPT_POST           => true, // TRUE を設定すると、HTTP POST を行います。POST は、application/x-www-form-urlencoded 形式で 行われます。これは一般的な HTML のフォームと同じ形式です。
             //   CURLOPT_POSTFIELDS     => http_build_query($post_data) // TRUE にすると、CURLOPT_POSTFIELDS でのファイルアップロードの際の @ プレフィックスを無効にします。 つまり、@ で始まる値を安全に渡せるようになるということです。 アップロードには CURLFile が使われるでしょう。
       );
@@ -649,6 +646,7 @@ EOL;
             $options[CURLOPT_USERPWD]  = AsazukeConf::$authUser . ":" . AsazukeConf::$authPass; // 接続に使用するユーザー名とパスワード。 "[username]:[password]" 形式で指定します。
             $options[CURLOPT_HTTPAUTH] = CURLAUTH_ANY; // 使用する HTTP 認証方法。以下の中から選びます。 CURLAUTH_BASIC、 CURLAUTH_DIGEST、 CURLAUTH_GSSNEGOTIATE、 CURLAUTH_NTLM、 CURLAUTH_ANY および CURLAUTH_ANYSAFE。
       }
+      //　カスタムUAを使うと認証エラーになる場合$userAgentに''を設定する。
       if(strlen(AsazukeConf::$userAgent) > 0){
           $options[CURLOPT_USERAGENT] = AsazukeConf::$userAgent;
       }
