@@ -500,6 +500,10 @@ EOL;
         if (preg_match('/\.zip$|\.lzh$|\.tar$|\.tgz$|\.gz$|\.rar$/i', $path)) {
             return false;
         }
+        // 否定パスマッチ（特定のディレクトリだけ捜査対象外にした)
+        // if (preg_match('/path1\/path2/i', $path)) {
+        //     return false;
+        // }
         return true;
     }
     /**
