@@ -466,8 +466,8 @@ class AsazukeSiteScan
                 $unitTestResult['validLinks'][] = $key;
                 $aryData[] = $key;
 
-                $status200Onry = false; // ステータスコードを200に限定する 403リダイレクトなどを無視する場合はtrueを設定
-                if($status200Onry){
+                $status200onry = false; // ステータスコードを200に限定する 403リダイレクトなどを無視する場合はtrueを設定
+                if($status200onry){
                   if (preg_match('/ OK$/i', $response[0])) {
                         $lastInsertId = $AsazukeSiteScanDB->insert($aryData);
                         if($lastInsertId > 0){
