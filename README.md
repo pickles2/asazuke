@@ -27,6 +27,8 @@ $ vim src/AsazukeConf.php
 ## 実行手順 - run
 ```
 $ composer run
+
+$ composer test もしくは　composer run-script test
 ```
 
 ## その他コマンド
