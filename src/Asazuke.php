@@ -435,7 +435,6 @@ class Asazuke
                     } elseif (strlen($cssSelector) > 0) {
                         // 上記以外のCSSセレクタを処理
 
-                        // A用
                         if($csvKey === '* sitecatalyst'){
                             // $csvRowData[$csvKey] = pq($doc[$cssSelector])->htmlOuter();
                             $csvRowData[$csvKey] = AsazukeUtil::stripReturn(pq($doc[$cssSelector])->htmlOuter());
@@ -455,25 +454,23 @@ class Asazuke
                             $selecter = AsazukeConf::$csv_cols['* shortcut-icon'];
                             $csvRowData['* shortcut-icon'] = pq($doc[$selecter])->attr('href');
 
-                        // }
-                        // T用
-                        //echo '$csvKey:'.$csvKey."\n";
-                        //   if($csvKey === '* sitecatalyst1'){
-                        //     // $csvRowData[$csvKey] = pq($doc[$cssSelector])->htmlOuter();
-                        //     $csvRowData[$csvKey] = AsazukeUtil::stripReturn(pq($doc[$cssSelector])->htmlOuter());
-                        //   }else if($csvKey === '* sitecatalyst2'){
-                        //     $scripts = array();
-                        //     foreach($doc[$cssSelector] AS $obj){
-                        //       $scriptTag = pq($obj)->htmlOuter();
-                        //       array_push($scripts, $scriptTag);
-                        //     }
-                        //     // var_dump($scripts);
-                        //     // die();
-                        //     // $csvRowData[$csvKey] = implode(',',preg_grep("/(SCoutput_bc)/s", $scripts));
-                        //     $csvRowData[$csvKey] = AsazukeUtil::stripReturn(implode(',',preg_grep("/(SCoutput_bc)/s", $scripts)));
-                        //   }
-
                         // Toyota Ph2
+                        // Grep
+                        }else if(preg_match('/^\*\s+grep-count-/', $csvKey)){
+                            $selecter = AsazukeConf::$csv_cols[$csvKey];
+                            preg_match_all ( "|^.*" .preg_quote($selecter). ".*$|Um", $html , $matches, PREG_PATTERN_ORDER);
+                            $csvRowData[$csvKey] = count($matches[0]);
+                        }else if(preg_match('/^\*\s+grep-has-/', $csvKey)){
+                            $selecter = AsazukeConf::$csv_cols[$csvKey];
+                            preg_match_all ( "|^.*" .preg_quote($selecter). ".*$|Um", $html , $matches, PREG_PATTERN_ORDER);
+                            if(count($matches[0]) > 0){
+                                $csvRowData[$csvKey] =  '+';
+                            }
+                        }else if(preg_match('/^\*\s+grep-/', $csvKey)){
+                            $selecter = AsazukeConf::$csv_cols[$csvKey];
+                            preg_match_all ( "|^.*" .preg_quote($selecter). ".*$|Um", $html , $matches, PREG_PATTERN_ORDER);
+                            $csvRowData[$csvKey] = implode("\n", $matches[0]);
+
                         }else if(preg_match('/^\*\s+has-/', $csvKey)){
                             // 存在チェック
                             $selecter = AsazukeConf::$csv_cols[$csvKey];
