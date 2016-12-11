@@ -293,7 +293,8 @@ function siteValidationCsv()
     // php index.php site-validation-csv
     // サイト検証を行ったデータをCSV出力
     $AsazukeSiteScanDB = new Asazuke\AsazukeDB();
-    $result = $AsazukeSiteScanDB->selectAsazuke("1=1 ORDER BY filePath");
+    // $result = $AsazukeSiteScanDB->selectAsazuke("1=1 ORDER BY filePath"); // CSV出力をfilePathでソート
+    $result = $AsazukeSiteScanDB->selectAsazuke("1=1");
     
     $Asazuke = new Asazuke\Asazuke();
     $Asazuke->createPx2CSV($result);
