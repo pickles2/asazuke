@@ -11,11 +11,24 @@ Asazuke は、Pickles 2の支援ツールです。
 
 Asazuke のインストールは、`composer` コマンドを使用します。
 
+(Windowsユーザーの場合)
 ```
-$ git clone https://github.com/misak1/m-asazuke.git
+cmd> git clone https://github.com/pickles2/asazuke.git
+cmd> cd asazuke
+cmd> composer install
+cmd> DEL src\AsazukeConf.php
+cmd> COPY src\AsazukeConf-sample.jp.php src\AsazukeConf.php
+(chcpコマンドプロンプトの文字コード(CodePage)をutf-8にする shift_jisは932)
+cmd> chcp 65001
+```
+
+(Macユーザーの場合)
+```
+$ git clone https://github.com/pickles2/asazuke.git
 $ cd asazuke
-$ composer update
-$ composer darwin-chmod
+$ composer install
+$ chmod -R 777 src/data,
+$ chmod 777 src/Asazuke.log desktop.sql
 ```
 
 ## 設定変更
@@ -27,7 +40,33 @@ $ vim src/AsazukeConf.php
 ## 実行手順 - run
 ```
 $ composer run
+
+$ composer test もしくは　composer run-script test
 ```
+
+## 設定ファイル
+### スクレイピングの設定
+```
+    public static $csv_cols = [
+        (中略)
+        '* (CSVに表示する列名)' => 'CSSセレクタ', //基本形
+
+        // 列名を以下のように設定すると取得方法を変更するととが可能になります。
+        '* has-(CSVに表示する列名)' => 'CSSセレクタ', // CSSセレクタにマッチしたものがあれば"+"無ければ""をかえします。
+        '* (CSVに表示する列名)-link' => 'CSSセレクタ', // CSSセレクタのhref属性をかえします。
+        '* (CSVに表示する列名)-text' => 'CSSセレクタ', // CSSセレクタのinnerTextをかえします。
+
+        '* grep-count-(CSVに表示する列名)' => '検索文字列', // HTML文書中に検索文字列が存在する行数を返します。
+        '* grep-has-(CSVに表示する列名)' => '検索文字列', // HTML文書中に検索文字列が存在するものがあれば"+"無ければ""をかえします。
+        '* grep-(CSVに表示する列名)' => '検索文字列', // HTML文書中に検索文字列が存在する行を数を文字列として返します。
+
+        (中略)
+    ];
+```
+
+
+###
+
 
 ## その他コマンド
 |コマンド|コマンド説明|

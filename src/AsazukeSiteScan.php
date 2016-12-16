@@ -466,14 +466,25 @@ class AsazukeSiteScan
                 $unitTestResult['validLinks'][] = $key;
                 $aryData[] = $key;
 
-                $lastInsertId = $AsazukeSiteScanDB->insert($aryData);
-
-                if($lastInsertId > 0){
-                  // insertに成功したデータ
-                  $aryData[0]['id'] = $lastInsertId;
-                  echo "Result -> ".json_encode($aryData[0], JSON_UNESCAPED_UNICODE).PHP_EOL;
+                $status200onry = false; // ステータスコードを200に限定する 403リダイレクトなどを無視する場合はtrueを設定
+                if($status200onry){
+                  if (preg_match('/ OK$/i', $response[0])) {
+                        $lastInsertId = $AsazukeSiteScanDB->insert($aryData);
+                        if($lastInsertId > 0){
+                          // insertに成功したデータ
+                          $aryData[0]['id'] = $lastInsertId;
+                          echo "Result -> ".json_encode($aryData[0], JSON_UNESCAPED_UNICODE).PHP_EOL;
+                        }
+                  }
+                }else{
+                  $lastInsertId = $AsazukeSiteScanDB->insert($aryData);
+                  // 通常モード
+                  if($lastInsertId > 0){
+                    // insertに成功したデータ
+                    $aryData[0]['id'] = $lastInsertId;
+                    echo "Result -> ".json_encode($aryData[0], JSON_UNESCAPED_UNICODE).PHP_EOL;
+                  }
                 }
-
             }
         } catch (Exception $e) {
             AsazukeUtil::logE("DOM", print_r($e, true));

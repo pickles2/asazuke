@@ -1,35 +1,44 @@
 {
-	"name" : "mshiba/asazuke",
-	"type" : "library",
-	"license" : "MIT",
-	"keywords" : [
+	"name": "mshiba/asazuke",
+	"type": "library",
+	"license": "MIT",
+	"keywords": [
 		"api",
 		"Pickles2"
 	],
-	"homepage" : "http://pickles2.pxt.jp/tools/asazuke/",
-	"authors" : [{
-			"name" : "Misaki Shibata",
-			"email" : "misaki.pink@gmail.com"
+	"homepage": "http://pickles2.pxt.jp/tools/asazuke/",
+	"authors": [
+		{
+			"name": "Misaki Shibata",
+			"email": "misaki.pink@gmail.com"
 		}
 	],
-	"minimum-stability" : "stable",
-	"require" : {
-		"php" : ">=5.3.0",
-		"electrolinux/phpquery" : "^0.9.6",
-		"zendframework/zend-servicemanager" : "2.5.1",
-		"zendframework/zend-stdlib" : "2.5.1",
-		"zendframework/zend-text" : "2.5.1",
-		"symfony/finder" : "~2.7"
+	"minimum-stability": "stable",
+	"require": {
+		"php": ">=5.3.0",
+		"electrolinux/phpquery": "^0.9.6",
+		"zendframework/zend-servicemanager": "2.5.1",
+		"zendframework/zend-stdlib": "2.5.1",
+		"zendframework/zend-text": "2.5.1",
+		"symfony/finder": "~2.7"
 	},
-	"require-dev" : {
-		"phpunit/phpunit" : "4.1.*"
+	"require-dev": {
+		"phpunit/phpunit": "4.1.*"
 	},
-	"config" : {
-		"process-timeout" : 86400
+	"config": {
+		"process-timeout": 86400
 	},
-	"autoload" : {
-		"psr-4" : {
-			"Mshiba\\Px2lib\\Asazuke\\" : "src/"
+	"scripts": {
+		"run": [
+			"php index.php"
+		],
+		"test": [
+			"vendor/phpunit/phpunit/phpunit --configuration phpunit.xml"
+		]
+	},
+	"autoload": {
+		"psr-4": {
+			"Mshiba\\Px2lib\\Asazuke\\": "src/"
 		}
 	}
 }
